@@ -6,31 +6,31 @@ Preparada para apresentação na [15ª Semana de Infraestrutura da Internet no B
 
 A configuração incluída é uma base **single-node para laboratório e testes locais**. Recebe fluxos, armazena os eventos e provisiona um dashboard no Grafana. Para produção, dimensione recursos, retenção, autenticação, TLS e backups conforme seu ambiente.
 
-## Sumário
+## 📌 Sumário
 
-- [Quick start](#quick-start)
-- [Componentes e versões](#componentes)
-- [Portas e endpoints](#portas-e-endpoints)
-- [Arquitetura e arquivos](#arquitetura)
-- [Pré-requisitos](#pre-requisitos)
-- [Configuração e credenciais](#configuracao-env)
-- [Grafana e Kibana](#interfaces)
-- [Exportadores NetFlow](#exportadores-netflow)
-- [Persistência, retenção e atualização](#persistencia-e-dados)
-- [Operação e testes](#operacao)
-- [Segurança em produção](#seguranca-producao)
-- [Troubleshooting](#troubleshooting)
-- [Materiais](#materiais)
-- [Apoiadores](#apoiadores)
-- [Contato](#contato)
-- [Licença](#licenca)
+- [🚀 Quick start](#quick-start)
+- [🧱 Componentes e versões](#componentes)
+- [🧭 Portas e endpoints](#portas-e-endpoints)
+- [🗺️ Arquitetura e arquivos](#arquitetura)
+- [✅ Pré-requisitos](#pre-requisitos)
+- [🔧 Configuração e credenciais](#configuracao-env)
+- [📊 Grafana e Kibana](#interfaces)
+- [📡 Exportadores NetFlow](#exportadores-netflow)
+- [🗃️ Persistência, retenção e atualização](#persistencia-e-dados)
+- [🧰 Operação e testes](#operacao)
+- [🔐 Segurança em produção](#seguranca-producao)
+- [🧯 Troubleshooting](#troubleshooting)
+- [📚 Materiais](#materiais)
+- [🤝 Apoiadores](#apoiadores)
+- [📫 Contato](#contato)
+- [📄 Licença](#licenca)
 
 <a id="quick-start"></a>
-## Quick start
+## 🚀 Quick start
 
 Execute os comandos na pasta do repositório, com o Docker em execução. Consulte os [pré-requisitos](#pre-requisitos) antes de iniciar.
 
-### 1. Obtenha o projeto
+### 📥 1. Obtenha o projeto
 
 ```bash
 git clone https://github.com/nexthopsolutions/nxt-netflow-stack.git
@@ -39,7 +39,7 @@ cd nxt-netflow-stack
 
 Se você já tem o checkout, use a pasta existente.
 
-### 2. Gere o `.env` com senhas exclusivas
+### 🔑 2. Gere o `.env` com senhas exclusivas
 
 O comando abaixo usa Python 3, copia as configurações de `env.example` e preenche as três senhas. Ele **recusa sobrescrever um `.env` existente**.
 
@@ -61,7 +61,7 @@ PY
 
 Se preferir configurar manualmente, copie `env.example` para `.env` e preencha os campos de senha vazios antes de subir. Não reutilize senhas publicadas em versões antigas do exemplo.
 
-### 3. Valide e inicie
+### ▶️ 3. Valide e inicie
 
 ```bash
 docker compose config -q
@@ -72,7 +72,7 @@ docker compose ps -a
 
 A primeira inicialização pode levar alguns minutos. `setup_kibana_system_password` deve terminar com **Exited (0)**; os outros quatro serviços devem permanecer em execução. `up -d` sozinho não comprova que todas as aplicações estão prontas.
 
-### 4. Acesse e teste
+### 🧪 4. Acesse e teste
 
 - **[Grafana](http://localhost:3000)**: usuário `admin` (ou `GRAFANA_ADMIN_USER`) e senha `GRAFANA_ADMIN_PASSWORD` do `.env`.
 - **[Kibana](http://localhost:5601)**: usuário `elastic` e senha `ELASTIC_PASSWORD` do `.env`.
@@ -84,7 +84,7 @@ python3 scripts/smoke-test.py
 O teste gera um evento sintético; para receber tráfego real, configure os equipamentos para exportar para **IP do host Docker, UDP/2055**. Veja [exportadores](#exportadores-netflow).
 
 <a id="componentes"></a>
-## Componentes e versões
+## 🧱 Componentes e versões
 
 Versões fixadas no Compose e verificadas em **01/10/2026**:
 
@@ -101,7 +101,7 @@ Fontes oficiais: [Elasticsearch](https://www.elastic.co/downloads/elasticsearch/
 As tags são explícitas: `docker compose pull` baixa as versões declaradas, sem trocar automaticamente para uma versão futura. Mantenha os três componentes Elastic na mesma versão ao atualizar esta stack.
 
 <a id="portas-e-endpoints"></a>
-## Portas e endpoints
+## 🧭 Portas e endpoints
 
 | Serviço | Porta no host | Publicação padrão |
 |---|---|---|
@@ -115,7 +115,7 @@ Para acessar as interfaces HTTP a partir de outra máquina, configure `HTTP_BIND
 O teste automatizado usa `127.0.0.1` e as portas padrão. Execute-o com a publicação HTTP padrão ou em `0.0.0.0`. Se publicar exclusivamente em um IP de LAN, o teste precisará ser adaptado.
 
 <a id="arquitetura"></a>
-## Arquitetura e arquivos
+## 🗺️ Arquitetura e arquivos
 
 ```text
 Roteador / BRAS / switch
@@ -141,7 +141,7 @@ O módulo NetFlow do Filebeat decodifica os fluxos e envia os eventos ao Elastic
 | `scripts/smoke-test.py` | Teste local de ingestão e consulta |
 
 <a id="pre-requisitos"></a>
-## Pré-requisitos
+## ✅ Pré-requisitos
 
 - Docker Engine com Docker Compose v2 ou superior, ou Docker Desktop com Compose.
 - Python 3 para gerar o `.env` pelo exemplo e executar o teste, sem bibliotecas adicionais.
@@ -151,7 +151,7 @@ O módulo NetFlow do Filebeat decodifica os fluxos e envia os eventos ao Elastic
 
 A execução local desta atualização foi validada em Docker Desktop **ARM64**. Valide desempenho e capacidade no hardware de destino.
 
-### Memória virtual no Linux
+### 🐧 Memória virtual no Linux
 
 A documentação atual da Elastic recomenda `vm.max_map_count=1048576` para versões recentes. Consulte [configuração do sistema](https://www.elastic.co/docs/deploy-manage/deploy/self-managed/important-system-configuration).
 
@@ -164,7 +164,7 @@ Para persistir, adicione `vm.max_map_count=1048576` em um arquivo de configuraç
 No Docker Desktop, o kernel relevante é o da VM Linux do Docker, não o kernel do macOS. Consulte as instruções da Elastic para a sua plataforma antes de aplicar ajustes.
 
 <a id="configuracao-env"></a>
-## Configuração e credenciais
+## 🔧 Configuração e credenciais
 
 | Variável | Uso / padrão |
 |---|---|
@@ -180,16 +180,16 @@ O Compose recusa senhas ausentes ou vazias. O bootstrap aceita `KIBANA_SYSTEM_PA
 
 O Elasticsearch tem limite de **1 GB** no Compose e heap padrão de **512 MB**. Se ampliar o heap, ajuste também o limite do container e reserve memória para os demais serviços.
 
-### Inicialização e troca de senha
+### 🔑 Inicialização e troca de senha
 
 O serviço `setup_kibana_system_password` aguarda o healthcheck do Elasticsearch, configura a senha interna e encerra. O Kibana só inicia após o sucesso dessa etapa. `kibana_system` não é o usuário para login no navegador.
 
 As variáveis de administrador do Elasticsearch e do Grafana inicializam **volumes vazios**. Alterar apenas o `.env` não troca a senha de usuários já persistidos. Para manter os dados, altere as credenciais pelas ferramentas/API de cada produto e atualize os consumidores. Recriar volumes é uma opção apenas quando a perda de todos os dados for intencional.
 
 <a id="interfaces"></a>
-## Grafana e Kibana
+## 📊 Grafana e Kibana
 
-### Grafana
+### 📊 Grafana
 
 O datasource **Elasticsearch NetFlow** e o dashboard da pasta **NetFlow** são provisionados automaticamente. O UID do datasource coincide com o referenciado pelo JSON do dashboard.
 
@@ -197,7 +197,7 @@ Abra o [dashboard NetFlow](http://localhost:3000/d/fff4a0e1-5179-4224-b3bc-8377f
 
 O dashboard é mantido em `template-grafana.json`. Para preservar uma personalização, exporte o JSON e atualize esse arquivo, ou crie uma cópia com outro UID. O provisionamento não grava alterações da interface de volta no arquivo e pode substituir versões salvas na base. Veja [provisionamento do Grafana](https://grafana.com/docs/grafana/latest/administration/provisioning/).
 
-### Kibana
+### 🔎 Kibana
 
 Depois de receber o primeiro evento, abra **Discover** e crie uma data view com:
 
@@ -208,13 +208,13 @@ Depois de receber o primeiro evento, abra **Discover** e crie uma data view com:
 A data view não é criada automaticamente por este Compose. Para localizar o teste, filtre `source.ip: "192.0.2.10"` e ajuste o intervalo de tempo.
 
 <a id="exportadores-netflow"></a>
-## Exportadores NetFlow
+## 📡 Exportadores NetFlow
 
 Configure o destino como **IP do host Docker** e a porta **UDP/2055**. O Filebeat suporta NetFlow v5/v9 e IPFIX, entre outros formatos descritos no [módulo oficial](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-netflow.html).
 
 Para v9/IPFIX, o coletor precisa receber os templates do exportador antes de decodificar os registros. Após reiniciar o Filebeat, aguarde o reenvio dos templates. ACLs, NAT, firewall e redes do Docker Desktop devem permitir o tráfego até o coletor.
 
-### MikroTik / RouterOS
+### 📡 MikroTik / RouterOS
 
 Exemplo para NetFlow v9; ajuste interfaces e timeouts ao ambiente:
 
@@ -227,14 +227,14 @@ Confira os destinos existentes com `/ip traffic-flow target print` antes de adic
 
 Referência: [MikroTik — Traffic Flow](https://help.mikrotik.com/docs/spaces/ROS/pages/21102653/Traffic%2BFlow).
 
-### Huawei VRP / NetStream
+### 🌐 Huawei VRP / NetStream
 
 A sintaxe depende do modelo e da versão de VRP. Configure exportação v9, destino UDP/2055, IP de origem alcançável e coleta nas interfaces desejadas conforme o manual do equipamento. Não trate uma sequência genérica como configuração universal.
 
 Referência: [Huawei — exemplo de exportação de estatísticas de fluxo](https://support.huawei.cn/enterprise/en/doc/EDOC1100468733/85a6c438/example-for-configuring-flexible-flow-statistics-export).
 
 <a id="persistencia-e-dados"></a>
-## Persistência, retenção e atualização
+## 🗃️ Persistência, retenção e atualização
 
 Com o nome padrão do projeto Compose, os volumes são:
 
@@ -249,13 +249,13 @@ docker volume ls --filter name=nexthop_flow_stack
 
 O Filebeat não possui volume persistente nesta configuração; seu estado local e templates em memória não sobrevivem à recriação. UDP não garante entrega, e fluxos recebidos durante interrupções podem ser perdidos.
 
-### Retenção e backup
+### 💾 Retenção e backup
 
 Não há política de retenção personalizada nesta stack. Verifique a política ILM efetiva no Elasticsearch e defina rollover/exclusão conforme a capacidade do disco. Monitore espaço livre e taxa de ingestão.
 
 Para dados importantes, configure snapshots do Elasticsearch e backup consistente do Grafana, além de guardar as configurações e os segredos com acesso restrito. Volumes Docker não substituem backups.
 
-### Atualização da stack antiga
+### ⬆️ Atualização da stack antiga
 
 Os volumes atuais têm nomes diferentes dos usados com Elastic 8.12.2/Grafana 11.2.0. Atualizar o checkout não migra nem apaga os volumes antigos automaticamente.
 
@@ -264,9 +264,9 @@ Os volumes atuais têm nomes diferentes dos usados com Elastic 8.12.2/Grafana 11
 Para uma atualização futura, revise as notas de versão, altere as tags no Compose, planeje a compatibilidade dos volumes e execute os testes após a inicialização. Voltar somente a tag da imagem não é um rollback seguro de dados já migrados.
 
 <a id="operacao"></a>
-## Operação e testes
+## 🧰 Operação e testes
 
-### Iniciar ou aplicar mudanças no Compose / `.env`
+### ▶️ Iniciar ou aplicar mudanças no Compose / `.env`
 
 ```bash
 docker compose config -q
@@ -275,7 +275,7 @@ docker compose up -d
 
 `docker compose restart` não aplica mudanças nas variáveis de ambiente do container; use `up -d` para recriá-lo quando necessário.
 
-### Teste local de ponta a ponta
+### 🧪 Teste local de ponta a ponta
 
 ```bash
 python3 scripts/smoke-test.py
@@ -293,7 +293,7 @@ docker compose exec -T filebeat filebeat test config --strict.perms=false
 docker compose exec -T filebeat filebeat test output --strict.perms=false
 ```
 
-### Status e logs
+### 📋 Status e logs
 
 ```bash
 docker compose ps -a
@@ -301,20 +301,20 @@ docker compose logs --tail=100
 docker compose logs -f filebeat
 ```
 
-### Parar e retomar
+### ⏯️ Parar e retomar
 
 ```bash
 docker compose stop
 docker compose start
 ```
 
-### Remover containers e rede, preservando volumes
+### 📦 Remover containers e rede, preservando volumes
 
 ```bash
 docker compose down
 ```
 
-### Apagar os dados desta configuração
+### ⚠️ Apagar os dados desta configuração
 
 **Destrutivo:** o comando abaixo remove os volumes atuais, incluindo eventos e estado do Grafana. Use somente para reinicialização intencional ou após backup.
 
@@ -326,7 +326,7 @@ docker compose up -d
 Volumes antigos com nomes diferentes não são removidos por esse comando. Identifique-os antes de qualquer remoção manual. O `.env` e os arquivos montados do repositório permanecem no host.
 
 <a id="seguranca-producao"></a>
-## Segurança em produção
+## 🔐 Segurança em produção
 
 - Mantenha as interfaces HTTP atrás de VPN ou proxy com TLS e autenticação; não exponha diretamente 9200/5601/3000 na Internet.
 - Esta configuração usa HTTP também entre containers. Planeje TLS interno para produção.
@@ -337,25 +337,25 @@ Volumes antigos com nomes diferentes não são removidos por esse comando. Ident
 - O downloader GeoIP do Elasticsearch está desativado. Enriquecimento geográfico depende de bases disponíveis; não presuma que localização/ASN estejam preenchidos.
 
 <a id="troubleshooting"></a>
-## Troubleshooting
+## 🧯 Troubleshooting
 
-### Compose acusa senha ausente
+### 🔑 Compose acusa senha ausente
 
 Preencha as três senhas do `.env` ou gere o arquivo pelo Quick start. `env.example` propositalmente não fornece credenciais prontas.
 
-### Porta já está em uso
+### 🔌 Porta já está em uso
 
 Identifique o processo/container que ocupa a porta. Ajustar as portas publicadas exige atualizar também URLs e o teste local; não encerre serviços de outros projetos sem verificar sua finalidade.
 
-### Elasticsearch reinicia ou não inicia
+### 🧠 Elasticsearch reinicia ou não inicia
 
 Confira `docker compose logs --tail=100 elasticsearch`, memória disponível, espaço em disco, `vm.max_map_count` e compatibilidade do volume com a versão. Aumentar só o heap sem ajustar o limite de 1 GB pode causar falta de memória.
 
-### Elasticsearch retorna 401 ou aparece healthy sem aceitar login
+### 🔒 Elasticsearch retorna 401 ou aparece healthy sem aceitar login
 
 O healthcheck do Compose aceita 200/401 para detectar que o endpoint está respondendo. Isso não comprova credenciais válidas nem saúde do cluster. O smoke test faz a verificação autenticada e aceita cluster `green` ou `yellow`; em single-node, réplicas não alocadas podem causar `yellow`.
 
-### Kibana não conecta
+### 🔗 Kibana não conecta
 
 ```bash
 docker compose logs --tail=100 setup_kibana_system_password kibana
@@ -363,20 +363,20 @@ docker compose logs --tail=100 setup_kibana_system_password kibana
 
 O setup deve encerrar com código 0. Confirme credenciais, formato URL-safe de `KIBANA_SYSTEM_PASSWORD` e se houve alteração de senha no `.env` sem atualização do usuário persistido.
 
-### Grafana sem dados ou datasource com erro
+### 📊 Grafana sem dados ou datasource com erro
 
 Confira autenticação do datasource, existência de eventos em `filebeat-*` e intervalo de tempo. Antes do primeiro evento, o índice pode ainda não existir. Execute o smoke test e consulte os logs do Filebeat. Para personalizações do dashboard, mantenha o UID do datasource coerente com o JSON.
 
-### Fluxos do equipamento não aparecem
+### 📡 Fluxos do equipamento não aparecem
 
 Verifique destino/porta, interface de origem, ACLs e chegada dos pacotes UDP ao host. Em v9/IPFIX, aguarde os templates. Confira os timeouts de exportação, horário do equipamento e logs do Filebeat. O sucesso do teste local comprova ingestão local, mas não a conectividade entre roteador e host.
 
-### `filebeat test output` avisa que TLS está desativado
+### 🔐 `filebeat test output` avisa que TLS está desativado
 
 É esperado no laboratório: a saída está configurada como `http://elasticsearch:9200`. Para produção, configure TLS e a confiança nos certificados.
 
 <a id="materiais"></a>
-## Materiais
+## 📚 Materiais
 
 - [Template do dashboard Grafana](./template-grafana.json).
 - [Apresentação na GTER](./%5BGTER%2054%5D%20Elizandro%20Pacheco.pdf).
@@ -390,25 +390,25 @@ Obrigado aos apoiadores que fortalecem a iniciativa e a comunidade:
 
 <a href="https://nexthop.solutions/">
   <img
-    src="https://nexthop.solutions/wp-content/uploads/elementor/thumbs/NEXTHOP-LATERAL-1-r05q2h0ahcqhnnc4r4rn53b72q7bg3wzp3dnxbh7nk.png"
+    src="https://nexthop.solutions/assets/logo-horizontal.png"
     alt="NextHop Solutions"
     width="260"
   />
 </a>
 
-- Site: `https://nexthop.solutions/`
+- 🌐 Site: [nexthop.solutions](https://nexthop.solutions/)
 
 ### EvoCODE IA
 
-<a href="https://evocode.dev.br/">
+<a href="https://evocode.ia.br/">
   <img
-    src="https://evocode.dev.br/lovable-uploads/c52c93b9-8fbf-4e6d-998d-46475b3ede3d.png"
+    src="https://evocode.ia.br/logo-evocode.png"
     alt="EvoCODE IA"
     width="260"
   />
 </a>
 
-- Site: `https://evocode.dev.br/`
+- 🌐 Site: [evocode.ia.br](https://evocode.ia.br/)
 
 ---
 
@@ -427,3 +427,31 @@ Este projeto é distribuído sob a licença **Apache 2.0**. Veja o arquivo `LICE
 As imagens e dependências utilizadas possuem suas próprias licenças; a licença do repositório não substitui as condições de cada componente.
 
 A tradução de referência está em [LICENSE.pt-BR.md](./LICENSE.pt-BR.md). O texto aplicável do projeto está em [LICENSE](./LICENSE).
+
+### Resumo simples (o que pode e o que não pode) 🔎
+
+> Nota: este é um resumo prático e **não** substitui a leitura do `LICENSE` (nem é aconselhamento jurídico).
+
+#### Você PODE ✅
+
+- **Usar** a stack/código para qualquer finalidade (inclusive **comercial**).
+- **Modificar** (criar derivações/forks), inclusive “rebatizar” o seu fork e manter outro mantenedor.
+- **Redistribuir** (publicar) o original ou versões modificadas (em código-fonte ou empacotado).
+
+#### Você DEVE 📌
+
+- **Incluir uma cópia da licença Apache 2.0** quando redistribuir.
+- **Manter avisos de copyright/atribuição** e notices existentes.
+- **Indicar mudanças**: arquivos modificados devem conter aviso claro de que foram alterados.
+- Se houver arquivo `NOTICE` no futuro, **reproduzir o conteúdo aplicável** ao redistribuir.
+
+#### Você NÃO PODE 🚫
+
+- **Usar marcas/nome/logotipos** da NextHop Solutions (ou de terceiros) como se houvesse endosso/afiliações: a Apache 2.0 **não concede licença de marca** (ver “Trademarks” no `LICENSE`).
+- **Remover atribuições/avisos legais** existentes do projeto original ao redistribuir.
+
+Em outras palavras: **sim**, a Apache 2.0 permite você usar/alterar/redistribuir e até trocar o mantenedor do *seu fork*, **desde que** você cumpra as obrigações de atribuição/licença e não use marcas como se fossem permissão/endorso.
+
+### Licença em PT-BR (referência) 🇧🇷
+
+Para facilitar leitura, existe também o arquivo `LICENSE.pt-BR.md` (referência). Em caso de dúvida legal, use sempre o `LICENSE` (EN).
