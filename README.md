@@ -193,7 +193,9 @@ As variáveis de administrador do Elasticsearch e do Grafana inicializam **volum
 
 O datasource **Elasticsearch NetFlow** e o dashboard da pasta **NetFlow** são provisionados automaticamente. O UID do datasource coincide com o referenciado pelo JSON do dashboard.
 
-Abra o [dashboard NetFlow](http://localhost:3000/d/fff4a0e1-5179-4224-b3bc-8377fc6fcdb3). Os painéis exibem **volume em bytes**, sem conversões arbitrárias para bit/s. As séries somam bytes por intervalo; os gráficos geográficos somam bytes no período. Portas de origem/destino não representam, por si só, direção de entrada/saída. A atualização automática ocorre a cada **30 segundos**.
+Abra o [dashboard NetFlow](http://localhost:3000/d/fff4a0e1-5179-4224-b3bc-8377fc6fcdb3). Os painéis exibem **bps**, com escala decimal automática para **Kbps, Mbps e Gbps**. Cada janela fixa de 10 segundos calcula `soma(network.bytes) × 8 / 10`. Os gráficos geográficos mostram a média das janelas completas do período. Portas de origem/destino não representam, por si só, direção de entrada/saída. A atualização automática ocorre a cada **30 segundos**.
+
+A taxa é baseada no timestamp dos eventos reportados: fluxos longos exportados em lote podem gerar picos. Ela não equivale à medição instantânea da interface nem redistribui os bytes pela duração original dos fluxos. Ajuste os timeouts de exportação conforme a resolução desejada.
 
 A janela inicial é de **15 minutos**; ajuste o intervalo para encontrar eventos mais antigos. Sem fluxos recebidos, os painéis podem ficar sem dados.
 
@@ -285,7 +287,7 @@ python3 scripts/smoke-test.py
 
 O script verifica HTTP/saúde das aplicações, versões do Elasticsearch e Grafana, dashboard provisionado e datasource. Envia um fluxo NetFlow v5 por UDP e confirma **10 pacotes e 1.200 bytes** no Elasticsearch, seguido de consulta pela API de queries do Grafana. Sai com erro quando uma verificação falha.
 
-O evento usa `192.0.2.10` e `198.51.100.20`, endereços reservados para documentação, e permanece no índice. O teste também consulta os nove painéis, verifica unidades em bytes e confere o valor de 1.200 bytes nos quatro painéis de IPs/portas. Simula o pipeline de GeoIP com IPs públicos, sem indexar esses eventos, para verificar país e organizações AS; aguarde o download inicial das bases antes de executar. Cidade/estado dependem da cobertura das bases e podem estar ausentes mesmo para IPs públicos. O teste não valida exportadores físicos, v9/IPFIX, carga sustentada, perda de pacotes ou aparência de todos os painéis.
+O evento usa `192.0.2.10` e `198.51.100.20`, endereços reservados para documentação, e permanece no índice. O teste também consulta os nove painéis, verifica unidades em bps e confere a taxa de 960 bps para um evento de 1.200 bytes em uma janela de 10 segundos nos quatro painéis de IPs/portas. Simula o pipeline de GeoIP com IPs públicos, sem indexar esses eventos, para verificar país e organizações AS; aguarde o download inicial das bases antes de executar. Cidade/estado dependem da cobertura das bases e podem estar ausentes mesmo para IPs públicos. O teste não valida exportadores físicos, v9/IPFIX, carga sustentada, perda de pacotes ou aparência de todos os painéis.
 
 Verificações adicionais do Filebeat:
 

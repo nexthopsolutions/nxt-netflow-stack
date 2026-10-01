@@ -39,7 +39,7 @@
             }
           },
           "mappings": [],
-          "unit": "bytes"
+          "unit": "bps"
         },
         "overrides": [
           {
@@ -105,16 +105,17 @@
           "placement": "right",
           "showLegend": true,
           "values": [
+            "value",
             "percent"
           ]
         },
         "pieType": "pie",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "mean"
           ],
           "fields": "",
-          "values": true
+          "values": false
         },
         "sort": "desc",
         "tooltip": {
@@ -138,6 +139,16 @@
                 "size": "10"
               },
               "type": "terms"
+            },
+            {
+              "id": "3",
+              "type": "date_histogram",
+              "field": "@timestamp",
+              "settings": {
+                "interval": "10s",
+                "min_doc_count": "0",
+                "trimEdges": "1"
+              }
             }
           ],
           "datasource": {
@@ -148,7 +159,9 @@
             {
               "field": "network.bytes",
               "id": "1",
-              "settings": {},
+              "settings": {
+                "script": "_value * 8 / 10.0"
+              },
               "type": "sum"
             }
           ],
@@ -160,7 +173,7 @@
       "title": "📍 TRÁFEGO POR CIDADE",
       "transparent": true,
       "type": "piechart",
-      "description": "Volume total em bytes no período, agrupado pela localização do IP de origem. Requer GeoIP; IPs privados/reservados podem não ter localização."
+      "description": "Taxa média por janela de 10 segundos: soma(network.bytes) × 8 / 10. Baseada no timestamp dos eventos exportados, não na duração original do fluxo. Escala automática em bps/Kbps/Mbps/Gbps. Exibe a média das janelas completas no período selecionado, por localização de origem. GeoIP pode não cobrir cidade/estado."
     },
     {
       "datasource": {
@@ -180,7 +193,7 @@
             }
           },
           "mappings": [],
-          "unit": "bytes"
+          "unit": "bps"
         },
         "overrides": [
           {
@@ -246,16 +259,17 @@
           "placement": "right",
           "showLegend": true,
           "values": [
+            "value",
             "percent"
           ]
         },
         "pieType": "pie",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "mean"
           ],
           "fields": "",
-          "values": true
+          "values": false
         },
         "sort": "desc",
         "tooltip": {
@@ -279,6 +293,16 @@
                 "size": "10"
               },
               "type": "terms"
+            },
+            {
+              "id": "3",
+              "type": "date_histogram",
+              "field": "@timestamp",
+              "settings": {
+                "interval": "10s",
+                "min_doc_count": "0",
+                "trimEdges": "1"
+              }
             }
           ],
           "datasource": {
@@ -289,7 +313,9 @@
             {
               "field": "network.bytes",
               "id": "1",
-              "settings": {},
+              "settings": {
+                "script": "_value * 8 / 10.0"
+              },
               "type": "sum"
             }
           ],
@@ -301,7 +327,7 @@
       "title": "📍 TRÁFEGO POR ESTADO",
       "transparent": true,
       "type": "piechart",
-      "description": "Volume total em bytes no período, agrupado pela localização do IP de origem. Requer GeoIP; IPs privados/reservados podem não ter localização."
+      "description": "Taxa média por janela de 10 segundos: soma(network.bytes) × 8 / 10. Baseada no timestamp dos eventos exportados, não na duração original do fluxo. Escala automática em bps/Kbps/Mbps/Gbps. Exibe a média das janelas completas no período selecionado, por localização de origem. GeoIP pode não cobrir cidade/estado."
     },
     {
       "datasource": {
@@ -321,7 +347,7 @@
             }
           },
           "mappings": [],
-          "unit": "bytes"
+          "unit": "bps"
         },
         "overrides": [
           {
@@ -387,16 +413,17 @@
           "placement": "right",
           "showLegend": true,
           "values": [
+            "value",
             "percent"
           ]
         },
         "pieType": "pie",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "mean"
           ],
           "fields": "",
-          "values": true
+          "values": false
         },
         "sort": "desc",
         "tooltip": {
@@ -420,6 +447,16 @@
                 "size": "10"
               },
               "type": "terms"
+            },
+            {
+              "id": "3",
+              "type": "date_histogram",
+              "field": "@timestamp",
+              "settings": {
+                "interval": "10s",
+                "min_doc_count": "0",
+                "trimEdges": "1"
+              }
             }
           ],
           "datasource": {
@@ -430,7 +467,9 @@
             {
               "field": "network.bytes",
               "id": "1",
-              "settings": {},
+              "settings": {
+                "script": "_value * 8 / 10.0"
+              },
               "type": "sum"
             }
           ],
@@ -442,7 +481,7 @@
       "title": "📍 TRÁFEGO POR PAÍS",
       "transparent": true,
       "type": "piechart",
-      "description": "Volume total em bytes no período, agrupado pela localização do IP de origem. Requer GeoIP; IPs privados/reservados podem não ter localização."
+      "description": "Taxa média por janela de 10 segundos: soma(network.bytes) × 8 / 10. Baseada no timestamp dos eventos exportados, não na duração original do fluxo. Escala automática em bps/Kbps/Mbps/Gbps. Exibe a média das janelas completas no período selecionado, por localização de origem. GeoIP pode não cobrir cidade/estado."
     },
     {
       "datasource": {
@@ -502,7 +541,7 @@
               }
             ]
           },
-          "unit": "bytes"
+          "unit": "bps"
         },
         "overrides": []
       },
@@ -549,10 +588,10 @@
               "field": "@timestamp",
               "id": "3",
               "settings": {
-                "interval": "auto",
-                "min_doc_count": "1",
+                "interval": "10s",
+                "min_doc_count": "0",
                 "timeZone": "utc",
-                "trimEdges": "0"
+                "trimEdges": "1"
               },
               "type": "date_histogram"
             }
@@ -561,7 +600,9 @@
             {
               "field": "network.bytes",
               "id": "1",
-              "settings": {},
+              "settings": {
+                "script": "_value * 8 / 10.0"
+              },
               "type": "sum"
             }
           ],
@@ -577,7 +618,7 @@
       "title": "🚀 TOP 20 - PORTAS ORIGEM",
       "transparent": true,
       "type": "timeseries",
-      "description": "Volume em bytes reportado nos fluxos, agregado por intervalo de tempo. Não é taxa em bit/s nem mede velocidade instantânea da interface."
+      "description": "Taxa média por janela de 10 segundos: soma(network.bytes) × 8 / 10. Baseada no timestamp dos eventos exportados, não na duração original do fluxo. Escala automática em bps/Kbps/Mbps/Gbps."
     },
     {
       "datasource": {
@@ -637,7 +678,7 @@
               }
             ]
           },
-          "unit": "bytes"
+          "unit": "bps"
         },
         "overrides": []
       },
@@ -686,10 +727,10 @@
               "field": "@timestamp",
               "id": "3",
               "settings": {
-                "interval": "auto",
-                "min_doc_count": "1",
+                "interval": "10s",
+                "min_doc_count": "0",
                 "timeZone": "utc",
-                "trimEdges": "0"
+                "trimEdges": "1"
               },
               "type": "date_histogram"
             }
@@ -698,7 +739,9 @@
             {
               "field": "network.bytes",
               "id": "1",
-              "settings": {},
+              "settings": {
+                "script": "_value * 8 / 10.0"
+              },
               "type": "sum"
             }
           ],
@@ -714,7 +757,7 @@
       "title": "🚀 TOP 20 - PORTAS DESTINO",
       "transparent": true,
       "type": "timeseries",
-      "description": "Volume em bytes reportado nos fluxos, agregado por intervalo de tempo. Não é taxa em bit/s nem mede velocidade instantânea da interface."
+      "description": "Taxa média por janela de 10 segundos: soma(network.bytes) × 8 / 10. Baseada no timestamp dos eventos exportados, não na duração original do fluxo. Escala automática em bps/Kbps/Mbps/Gbps."
     },
     {
       "collapsed": false,
@@ -787,7 +830,7 @@
               }
             ]
           },
-          "unit": "bytes"
+          "unit": "bps"
         },
         "overrides": []
       },
@@ -837,10 +880,10 @@
               "field": "@timestamp",
               "id": "3",
               "settings": {
-                "interval": "auto",
-                "min_doc_count": "1",
+                "interval": "10s",
+                "min_doc_count": "0",
                 "timeZone": "utc",
-                "trimEdges": "0"
+                "trimEdges": "1"
               },
               "type": "date_histogram"
             }
@@ -849,7 +892,9 @@
             {
               "field": "network.bytes",
               "id": "1",
-              "settings": {},
+              "settings": {
+                "script": "_value * 8 / 10.0"
+              },
               "type": "sum"
             }
           ],
@@ -865,7 +910,7 @@
       "title": "🚀 TOP 20 - AS ORIGEM",
       "transparent": true,
       "type": "timeseries",
-      "description": "Volume em bytes reportado nos fluxos, agregado por intervalo de tempo. Não é taxa em bit/s nem mede velocidade instantânea da interface. Nomes de organizações AS dependem de GeoIP ASN para IPs públicos."
+      "description": "Taxa média por janela de 10 segundos: soma(network.bytes) × 8 / 10. Baseada no timestamp dos eventos exportados, não na duração original do fluxo. Escala automática em bps/Kbps/Mbps/Gbps."
     },
     {
       "collapsed": false,
@@ -938,7 +983,7 @@
               }
             ]
           },
-          "unit": "bytes"
+          "unit": "bps"
         },
         "overrides": []
       },
@@ -985,10 +1030,10 @@
               "field": "@timestamp",
               "id": "3",
               "settings": {
-                "interval": "auto",
-                "min_doc_count": "1",
+                "interval": "10s",
+                "min_doc_count": "0",
                 "timeZone": "utc",
-                "trimEdges": "0"
+                "trimEdges": "1"
               },
               "type": "date_histogram"
             }
@@ -997,7 +1042,9 @@
             {
               "field": "network.bytes",
               "id": "1",
-              "settings": {},
+              "settings": {
+                "script": "_value * 8 / 10.0"
+              },
               "type": "sum"
             }
           ],
@@ -1013,7 +1060,7 @@
       "title": "🚀 TOP 20 - AS DESTINO",
       "transparent": true,
       "type": "timeseries",
-      "description": "Volume em bytes reportado nos fluxos, agregado por intervalo de tempo. Não é taxa em bit/s nem mede velocidade instantânea da interface. Nomes de organizações AS dependem de GeoIP ASN para IPs públicos."
+      "description": "Taxa média por janela de 10 segundos: soma(network.bytes) × 8 / 10. Baseada no timestamp dos eventos exportados, não na duração original do fluxo. Escala automática em bps/Kbps/Mbps/Gbps."
     },
     {
       "datasource": {
@@ -1073,7 +1120,7 @@
               }
             ]
           },
-          "unit": "bytes"
+          "unit": "bps"
         },
         "overrides": []
       },
@@ -1122,10 +1169,10 @@
               "field": "@timestamp",
               "id": "3",
               "settings": {
-                "interval": "auto",
-                "min_doc_count": "1",
+                "interval": "10s",
+                "min_doc_count": "0",
                 "timeZone": "utc",
-                "trimEdges": "0"
+                "trimEdges": "1"
               },
               "type": "date_histogram"
             }
@@ -1134,7 +1181,9 @@
             {
               "field": "network.bytes",
               "id": "1",
-              "settings": {},
+              "settings": {
+                "script": "_value * 8 / 10.0"
+              },
               "type": "sum"
             }
           ],
@@ -1150,7 +1199,7 @@
       "title": "🚀 TOP 20 - IPS ORIGEM",
       "transparent": true,
       "type": "timeseries",
-      "description": "Volume em bytes reportado nos fluxos, agregado por intervalo de tempo. Não é taxa em bit/s nem mede velocidade instantânea da interface."
+      "description": "Taxa média por janela de 10 segundos: soma(network.bytes) × 8 / 10. Baseada no timestamp dos eventos exportados, não na duração original do fluxo. Escala automática em bps/Kbps/Mbps/Gbps."
     },
     {
       "datasource": {
@@ -1210,7 +1259,7 @@
               }
             ]
           },
-          "unit": "bytes"
+          "unit": "bps"
         },
         "overrides": []
       },
@@ -1259,10 +1308,10 @@
               "field": "@timestamp",
               "id": "3",
               "settings": {
-                "interval": "auto",
-                "min_doc_count": "1",
+                "interval": "10s",
+                "min_doc_count": "0",
                 "timeZone": "utc",
-                "trimEdges": "0"
+                "trimEdges": "1"
               },
               "type": "date_histogram"
             }
@@ -1271,7 +1320,9 @@
             {
               "field": "network.bytes",
               "id": "1",
-              "settings": {},
+              "settings": {
+                "script": "_value * 8 / 10.0"
+              },
               "type": "sum"
             }
           ],
@@ -1287,7 +1338,7 @@
       "title": "🚀 TOP 20 - IPS DESTINO",
       "transparent": true,
       "type": "timeseries",
-      "description": "Volume em bytes reportado nos fluxos, agregado por intervalo de tempo. Não é taxa em bit/s nem mede velocidade instantânea da interface."
+      "description": "Taxa média por janela de 10 segundos: soma(network.bytes) × 8 / 10. Baseada no timestamp dos eventos exportados, não na duração original do fluxo. Escala automática em bps/Kbps/Mbps/Gbps."
     }
   ],
   "preload": false,
@@ -1318,7 +1369,7 @@
   "timezone": "browser",
   "title": "[NEXTHOP - ANALISE POR GLOBAL NETFLOW]",
   "uid": "fff4a0e1-5179-4224-b3bc-8377fc6fcdb3",
-  "version": 4,
+  "version": 5,
   "refresh": "30s",
-  "description": "Volumes de bytes reportados pelos exportadores NetFlow/IPFIX. As séries agregam bytes por intervalo de tempo; não representam velocidade instantânea. Localização e organização AS dependem do enriquecimento GeoIP de IPs públicos."
+  "description": "Taxas em bps (escala automática Kbps/Mbps/Gbps), calculadas como bytes reportados × 8 / 10 segundos. Eventos são agrupados pelo timestamp de exportação; não é medição instantânea da interface nem redistribuição pela duração original dos fluxos."
 }

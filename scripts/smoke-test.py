@@ -111,14 +111,14 @@ dashboard = grafana('/api/dashboards/uid/fff4a0e1-5179-4224-b3bc-8377fc6fcdb3')[
 for panel in dashboard['panels']:
     if not panel.get('targets'):
         continue
-    assert panel['fieldConfig']['defaults']['unit'] == 'bytes', panel['title']
+    assert panel['fieldConfig']['defaults']['unit'] == 'bps', panel['title']
     queries = json.loads(json.dumps(panel['targets']))
     for target in queries:
         target.update(datasource={'type': 'elasticsearch', 'uid': uid},
                       intervalMs=10000, maxDataPoints=100)
         target['query'] = f'source.ip:"192.0.2.10" AND source.port:{source_port}'
         for metric in target['metrics']:
-            assert not metric.get('settings', {}).get('script'), panel['title']
+            assert metric.get('settings', {}).get('script') == '_value * 8 / 10.0', panel['title']
     response = grafana('/api/ds/query', {
         'from': str((now - 60) * 1000), 'to': str((now + 60) * 1000),
         'queries': queries,
@@ -129,7 +129,7 @@ for panel in dashboard['panels']:
                   for field, data in zip(frame['schema']['fields'], frame['data']['values'])
                   if field['type'] == 'number' for v in data if v is not None]
         if panel['id'] in (9, 10, 11, 12):
-            assert sum(values) == 1200, (panel['title'], values)
+            assert abs(sum(values) - 960) < 0.001, (panel['title'], values)
     print('OK: panel query and units:', panel['title'])
 
 # Exercise the actual ingest pipeline without creating fake public-IP traffic.
