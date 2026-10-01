@@ -1,6 +1,6 @@
 # nxt-netflow-stack (NextHop Flow Stack)
 
-Stack de **NetFlow para ISPs**, com **Elasticsearch, Kibana, Filebeat e Grafana**, desenvolvida pela **NextHop Solutions**, através de seu CEO **Elizandro Pacheco**, como contribuição para a comunidade.
+Stack de **NetFlow para ISPs**, com **Elasticsearch, Kibana, Filebeat e Grafana**, desenvolvida pela **NextHop Solutions®**, através de seu CEO **Elizandro Pacheco**, como contribuição para a comunidade.
 
 Preparada para apresentação na [15ª Semana de Infraestrutura da Internet no Brasil](https://semanainfra.nic.br/) e no [GTER/GTS](https://gtergts.nic.br/). Se o projeto lhe for útil, deixe uma estrela no GitHub.
 
@@ -30,7 +30,7 @@ A configuração incluída é uma base **single-node para laboratório e testes 
 
 Execute os comandos na pasta do repositório, com o Docker em execução. Consulte os [pré-requisitos](#pre-requisitos) antes de iniciar.
 
-### 📥 1. Obtenha o projeto
+### 1. Obtenha o projeto
 
 ```bash
 git clone https://github.com/nexthopsolutions/nxt-netflow-stack.git
@@ -39,7 +39,7 @@ cd nxt-netflow-stack
 
 Se você já tem o checkout, use a pasta existente.
 
-### 🔑 2. Gere o `.env` com senhas exclusivas
+### 2. Gere o `.env` com senhas exclusivas
 
 O comando abaixo usa Python 3, copia as configurações de `env.example` e preenche as três senhas. Ele **recusa sobrescrever um `.env` existente**.
 
@@ -61,7 +61,7 @@ PY
 
 Se preferir configurar manualmente, copie `env.example` para `.env` e preencha os campos de senha vazios antes de subir. Não reutilize senhas publicadas em versões antigas do exemplo.
 
-### ▶️ 3. Valide e inicie
+### 3. Valide e inicie
 
 ```bash
 docker compose config -q
@@ -72,7 +72,7 @@ docker compose ps -a
 
 A primeira inicialização pode levar alguns minutos. `setup_kibana_system_password` deve terminar com **Exited (0)**; os outros quatro serviços devem permanecer em execução. `up -d` sozinho não comprova que todas as aplicações estão prontas.
 
-### 🧪 4. Acesse e teste
+### 4. Acesse e teste
 
 - **[Grafana](http://localhost:3000)**: usuário `admin` (ou `GRAFANA_ADMIN_USER`) e senha `GRAFANA_ADMIN_PASSWORD` do `.env`.
 - **[Kibana](http://localhost:5601)**: usuário `elastic` e senha `ELASTIC_PASSWORD` do `.env`.
@@ -151,7 +151,7 @@ O módulo NetFlow do Filebeat decodifica os fluxos e envia os eventos ao Elastic
 
 A execução local desta atualização foi validada em Docker Desktop **ARM64**. Valide desempenho e capacidade no hardware de destino.
 
-### 🐧 Memória virtual no Linux
+### Memória virtual no Linux
 
 A documentação atual da Elastic recomenda `vm.max_map_count=1048576` para versões recentes. Consulte [configuração do sistema](https://www.elastic.co/docs/deploy-manage/deploy/self-managed/important-system-configuration).
 
@@ -180,7 +180,7 @@ O Compose recusa senhas ausentes ou vazias. O bootstrap aceita `KIBANA_SYSTEM_PA
 
 O Elasticsearch tem limite de **1 GB** no Compose e heap padrão de **512 MB**. Se ampliar o heap, ajuste também o limite do container e reserve memória para os demais serviços.
 
-### 🔑 Inicialização e troca de senha
+### Inicialização e troca de senha
 
 O serviço `setup_kibana_system_password` aguarda o healthcheck do Elasticsearch, configura a senha interna e encerra. O Kibana só inicia após o sucesso dessa etapa. `kibana_system` não é o usuário para login no navegador.
 
@@ -189,7 +189,7 @@ As variáveis de administrador do Elasticsearch e do Grafana inicializam **volum
 <a id="interfaces"></a>
 ## 📊 Grafana e Kibana
 
-### 📊 Grafana
+### Grafana
 
 O datasource **Elasticsearch NetFlow** e o dashboard da pasta **NetFlow** são provisionados automaticamente. O UID do datasource coincide com o referenciado pelo JSON do dashboard.
 
@@ -201,7 +201,7 @@ A janela inicial é de **15 minutos**; ajuste o intervalo para encontrar eventos
 
 O dashboard é mantido em `template-grafana.json`. Para preservar uma personalização, exporte o JSON e atualize esse arquivo, ou crie uma cópia com outro UID. O provisionamento não grava alterações da interface de volta no arquivo e pode substituir versões salvas na base. Veja [provisionamento do Grafana](https://grafana.com/docs/grafana/latest/administration/provisioning/).
 
-### 🔎 Kibana
+### Kibana
 
 Depois de receber o primeiro evento, abra **Discover** e crie uma data view com:
 
@@ -218,7 +218,7 @@ Configure o destino como **IP do host Docker** e a porta **UDP/2055**. O Filebea
 
 Para v9/IPFIX, o coletor precisa receber os templates do exportador antes de decodificar os registros. Após reiniciar o Filebeat, aguarde o reenvio dos templates. ACLs, NAT, firewall e redes do Docker Desktop devem permitir o tráfego até o coletor.
 
-### 📡 MikroTik / RouterOS
+### MikroTik / RouterOS
 
 Exemplo para NetFlow v9; ajuste interfaces e timeouts ao ambiente:
 
@@ -231,7 +231,7 @@ Confira os destinos existentes com `/ip traffic-flow target print` antes de adic
 
 Referência: [MikroTik — Traffic Flow](https://help.mikrotik.com/docs/spaces/ROS/pages/21102653/Traffic%2BFlow).
 
-### 🌐 Huawei VRP / NetStream
+### Huawei VRP / NetStream
 
 A sintaxe depende do modelo e da versão de VRP. Configure exportação v9, destino UDP/2055, IP de origem alcançável e coleta nas interfaces desejadas conforme o manual do equipamento. Não trate uma sequência genérica como configuração universal.
 
@@ -253,13 +253,13 @@ docker volume ls --filter name=nexthop_flow_stack
 
 O Filebeat não possui volume persistente nesta configuração; seu estado local e templates em memória não sobrevivem à recriação. UDP não garante entrega, e fluxos recebidos durante interrupções podem ser perdidos.
 
-### 💾 Retenção e backup
+### Retenção e backup
 
 Não há política de retenção personalizada nesta stack. Verifique a política ILM efetiva no Elasticsearch e defina rollover/exclusão conforme a capacidade do disco. Monitore espaço livre e taxa de ingestão.
 
 Para dados importantes, configure snapshots do Elasticsearch e backup consistente do Grafana, além de guardar as configurações e os segredos com acesso restrito. Volumes Docker não substituem backups.
 
-### ⬆️ Atualização da stack antiga
+### Atualização da stack antiga
 
 Os volumes atuais têm nomes diferentes dos usados com Elastic 8.12.2/Grafana 11.2.0. Atualizar o checkout não migra nem apaga os volumes antigos automaticamente.
 
@@ -270,7 +270,7 @@ Para uma atualização futura, revise as notas de versão, altere as tags no Com
 <a id="operacao"></a>
 ## 🧰 Operação e testes
 
-### ▶️ Iniciar ou aplicar mudanças no Compose / `.env`
+### Iniciar ou aplicar mudanças no Compose / `.env`
 
 ```bash
 docker compose config -q
@@ -279,7 +279,7 @@ docker compose up -d
 
 `docker compose restart` não aplica mudanças nas variáveis de ambiente do container; use `up -d` para recriá-lo quando necessário.
 
-### 🧪 Teste local de ponta a ponta
+### Teste local de ponta a ponta
 
 ```bash
 python3 scripts/smoke-test.py
@@ -297,7 +297,7 @@ docker compose exec -T filebeat filebeat test config --strict.perms=false
 docker compose exec -T filebeat filebeat test output --strict.perms=false
 ```
 
-### 📋 Status e logs
+### Status e logs
 
 ```bash
 docker compose ps -a
@@ -305,20 +305,20 @@ docker compose logs --tail=100
 docker compose logs -f filebeat
 ```
 
-### ⏯️ Parar e retomar
+### Parar e retomar
 
 ```bash
 docker compose stop
 docker compose start
 ```
 
-### 📦 Remover containers e rede, preservando volumes
+### Remover containers e rede, preservando volumes
 
 ```bash
 docker compose down
 ```
 
-### ⚠️ Apagar os dados desta configuração
+### Apagar os dados desta configuração
 
 **Destrutivo:** o comando abaixo remove os volumes atuais, incluindo eventos e estado do Grafana. Use somente para reinicialização intencional ou após backup.
 
@@ -343,23 +343,23 @@ Volumes antigos com nomes diferentes não são removidos por esse comando. Ident
 <a id="troubleshooting"></a>
 ## 🧯 Troubleshooting
 
-### 🔑 Compose acusa senha ausente
+### Compose acusa senha ausente
 
 Preencha as três senhas do `.env` ou gere o arquivo pelo Quick start. `env.example` propositalmente não fornece credenciais prontas.
 
-### 🔌 Porta já está em uso
+### Porta já está em uso
 
 Identifique o processo/container que ocupa a porta. Ajustar as portas publicadas exige atualizar também URLs e o teste local; não encerre serviços de outros projetos sem verificar sua finalidade.
 
-### 🧠 Elasticsearch reinicia ou não inicia
+### Elasticsearch reinicia ou não inicia
 
 Confira `docker compose logs --tail=100 elasticsearch`, memória disponível, espaço em disco, `vm.max_map_count` e compatibilidade do volume com a versão. Aumentar só o heap sem ajustar o limite de 1 GB pode causar falta de memória.
 
-### 🔒 Elasticsearch retorna 401 ou aparece healthy sem aceitar login
+### Elasticsearch retorna 401 ou aparece healthy sem aceitar login
 
 O healthcheck do Compose aceita 200/401 para detectar que o endpoint está respondendo. Isso não comprova credenciais válidas nem saúde do cluster. O smoke test faz a verificação autenticada e aceita cluster `green` ou `yellow`; em single-node, réplicas não alocadas podem causar `yellow`.
 
-### 🔗 Kibana não conecta
+### Kibana não conecta
 
 ```bash
 docker compose logs --tail=100 setup_kibana_system_password kibana
@@ -367,15 +367,15 @@ docker compose logs --tail=100 setup_kibana_system_password kibana
 
 O setup deve encerrar com código 0. Confirme credenciais, formato URL-safe de `KIBANA_SYSTEM_PASSWORD` e se houve alteração de senha no `.env` sem atualização do usuário persistido.
 
-### 📊 Grafana sem dados ou datasource com erro
+### Grafana sem dados ou datasource com erro
 
 Confira autenticação do datasource, existência de eventos em `filebeat-*` e intervalo de tempo. Antes do primeiro evento, o índice pode ainda não existir. Execute o smoke test e consulte os logs do Filebeat. Para personalizações do dashboard, mantenha o UID do datasource coerente com o JSON.
 
-### 📡 Fluxos do equipamento não aparecem
+### Fluxos do equipamento não aparecem
 
 Verifique destino/porta, interface de origem, ACLs e chegada dos pacotes UDP ao host. Em v9/IPFIX, aguarde os templates. Confira os timeouts de exportação, horário do equipamento e logs do Filebeat. O sucesso do teste local comprova ingestão local, mas não a conectividade entre roteador e host.
 
-### 🔐 `filebeat test output` avisa que TLS está desativado
+### `filebeat test output` avisa que TLS está desativado
 
 É esperado no laboratório: a saída está configurada como `http://elasticsearch:9200`. Para produção, configure TLS e a confiança nos certificados.
 
@@ -390,24 +390,24 @@ Verifique destino/porta, interface de origem, ACLs e chegada dos pacotes UDP ao 
 
 Obrigado aos apoiadores que fortalecem a iniciativa e a comunidade:
 
-### NextHop Solutions
+### NextHop Solutions®
 
 <a href="https://nexthop.solutions/">
   <img
     src="https://nexthop.solutions/assets/logo-horizontal.png"
-    alt="NextHop Solutions"
+    alt="NextHop Solutions®"
     width="260"
   />
 </a>
 
 - 🌐 Site: [nexthop.solutions](https://nexthop.solutions/)
 
-### EvoCODE IA
+### EvoCODE IA®
 
 <a href="https://evocode.ia.br/">
   <img
     src="https://evocode.ia.br/logo-evocode.png"
-    alt="EvoCODE IA"
+    alt="EvoCODE IA®"
     width="260"
   />
 </a>
@@ -427,6 +427,8 @@ Obrigado aos apoiadores que fortalecem a iniciativa e a comunidade:
 ## 📄 Licença
 
 Este projeto é distribuído sob a licença **Apache 2.0**. Veja o arquivo `LICENSE`.
+
+NextHop Solutions®, EvoCODE IA® e Network Education® são marcas registradas. A licença do código não concede direitos sobre essas marcas.
 
 As imagens e dependências utilizadas possuem suas próprias licenças; a licença do repositório não substitui as condições de cada componente.
 
@@ -451,7 +453,7 @@ A tradução de referência está em [LICENSE.pt-BR.md](./LICENSE.pt-BR.md). O t
 
 #### Você NÃO PODE 🚫
 
-- **Usar marcas/nome/logotipos** da NextHop Solutions (ou de terceiros) como se houvesse endosso/afiliações: a Apache 2.0 **não concede licença de marca** (ver “Trademarks” no `LICENSE`).
+- **Usar marcas/nome/logotipos** da NextHop Solutions® (ou de terceiros) como se houvesse endosso/afiliações: a Apache 2.0 **não concede licença de marca** (ver “Trademarks” no `LICENSE`).
 - **Remover atribuições/avisos legais** existentes do projeto original ao redistribuir.
 
 Em outras palavras: **sim**, a Apache 2.0 permite você usar/alterar/redistribuir e até trocar o mantenedor do *seu fork*, **desde que** você cumpra as obrigações de atribuição/licença e não use marcas como se fossem permissão/endorso.
