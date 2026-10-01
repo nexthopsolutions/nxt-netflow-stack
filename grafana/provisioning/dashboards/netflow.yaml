@@ -3,5 +3,6 @@ providers:
   - name: NetFlow
     folder: NetFlow
     type: file
+    updateIntervalSeconds: 30
     options:
       path: /var/lib/grafana/dashboards

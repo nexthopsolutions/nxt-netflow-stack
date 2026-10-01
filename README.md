@@ -193,7 +193,9 @@ As variáveis de administrador do Elasticsearch e do Grafana inicializam **volum
 
 O datasource **Elasticsearch NetFlow** e o dashboard da pasta **NetFlow** são provisionados automaticamente. O UID do datasource coincide com o referenciado pelo JSON do dashboard.
 
-Abra o [dashboard NetFlow](http://localhost:3000/d/fff4a0e1-5179-4224-b3bc-8377fc6fcdb3). A janela inicial é de **15 minutos**; ajuste o intervalo para encontrar eventos mais antigos. Sem fluxos recebidos, os painéis podem ficar sem dados.
+Abra o [dashboard NetFlow](http://localhost:3000/d/fff4a0e1-5179-4224-b3bc-8377fc6fcdb3). Os painéis exibem **volume em bytes**, sem conversões arbitrárias para bit/s. As séries somam bytes por intervalo; os gráficos geográficos somam bytes no período. Portas de origem/destino não representam, por si só, direção de entrada/saída. A atualização automática ocorre a cada **30 segundos**.
+
+A janela inicial é de **15 minutos**; ajuste o intervalo para encontrar eventos mais antigos. Sem fluxos recebidos, os painéis podem ficar sem dados.
 
 O dashboard é mantido em `template-grafana.json`. Para preservar uma personalização, exporte o JSON e atualize esse arquivo, ou crie uma cópia com outro UID. O provisionamento não grava alterações da interface de volta no arquivo e pode substituir versões salvas na base. Veja [provisionamento do Grafana](https://grafana.com/docs/grafana/latest/administration/provisioning/).
 
@@ -283,7 +285,7 @@ python3 scripts/smoke-test.py
 
 O script verifica HTTP/saúde das aplicações, versões do Elasticsearch e Grafana, dashboard provisionado e datasource. Envia um fluxo NetFlow v5 por UDP e confirma **10 pacotes e 1.200 bytes** no Elasticsearch, seguido de consulta pela API de queries do Grafana. Sai com erro quando uma verificação falha.
 
-O evento usa `192.0.2.10` e `198.51.100.20`, endereços reservados para documentação, e permanece no índice. O teste não valida exportadores físicos, v9/IPFIX, carga sustentada, perda de pacotes ou aparência de todos os painéis.
+O evento usa `192.0.2.10` e `198.51.100.20`, endereços reservados para documentação, e permanece no índice. O teste também consulta os nove painéis, verifica unidades em bytes e confere o valor de 1.200 bytes nos quatro painéis de IPs/portas. Simula o pipeline de GeoIP com IPs públicos, sem indexar esses eventos, para verificar país e organizações AS; aguarde o download inicial das bases antes de executar. Cidade/estado dependem da cobertura das bases e podem estar ausentes mesmo para IPs públicos. O teste não valida exportadores físicos, v9/IPFIX, carga sustentada, perda de pacotes ou aparência de todos os painéis.
 
 Verificações adicionais do Filebeat:
 
@@ -334,7 +336,7 @@ Volumes antigos com nomes diferentes não são removidos por esse comando. Ident
 - Restrinja a origem dos pacotes UDP/2055 aos exportadores autorizados.
 - Mantenha `.env` fora do Git, use senhas exclusivas e proteja backups/segredos.
 - Configure chaves persistentes de criptografia do Kibana para sessões, saved objects e reporting. O Compose atual não define essas chaves; alguns recursos de alertas/actions ficam indisponíveis e sessões podem ser invalidadas em reinícios.
-- O downloader GeoIP do Elasticsearch está desativado. Enriquecimento geográfico depende de bases disponíveis; não presuma que localização/ASN estejam preenchidos.
+- O downloader GeoIP do Elasticsearch está ativado e baixa as bases City/Country/ASN. Requer acesso à Internet aos endpoints da Elastic e de armazenamento das bases. IPs privados/reservados podem não ter localização ou organização AS; eventos antigos não são enriquecidos retroativamente.
 
 <a id="troubleshooting"></a>
 ## 🧯 Troubleshooting

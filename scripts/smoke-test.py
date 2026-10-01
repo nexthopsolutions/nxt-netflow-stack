@@ -105,3 +105,40 @@ counts = [value for frame in answer.get('frames', [])
 assert sum(counts) >= 1, 'Grafana query did not return the test flow'
 print('OK: flow queried through Grafana datasource; Elastic', version,
       '/ Grafana', health['version'])
+
+# Validate every panel query; documentation IPs intentionally have no GeoIP.
+dashboard = grafana('/api/dashboards/uid/fff4a0e1-5179-4224-b3bc-8377fc6fcdb3')['dashboard']
+for panel in dashboard['panels']:
+    if not panel.get('targets'):
+        continue
+    assert panel['fieldConfig']['defaults']['unit'] == 'bytes', panel['title']
+    queries = json.loads(json.dumps(panel['targets']))
+    for target in queries:
+        target.update(datasource={'type': 'elasticsearch', 'uid': uid},
+                      intervalMs=10000, maxDataPoints=100)
+        target['query'] = f'source.ip:"192.0.2.10" AND source.port:{source_port}'
+        for metric in target['metrics']:
+            assert not metric.get('settings', {}).get('script'), panel['title']
+    response = grafana('/api/ds/query', {
+        'from': str((now - 60) * 1000), 'to': str((now + 60) * 1000),
+        'queries': queries,
+    })
+    for answer in response['results'].values():
+        assert not answer.get('error'), (panel['title'], answer)
+        values = [v for frame in answer.get('frames', [])
+                  for field, data in zip(frame['schema']['fields'], frame['data']['values'])
+                  if field['type'] == 'number' for v in data if v is not None]
+        if panel['id'] in (9, 10, 11, 12):
+            assert sum(values) == 1200, (panel['title'], values)
+    print('OK: panel query and units:', panel['title'])
+
+# Exercise the actual ingest pipeline without creating fake public-IP traffic.
+pipeline = 'filebeat-' + version + '-netflow-log-pipeline'
+simulation = wait_for(lambda: es(f'/_ingest/pipeline/{pipeline}/_simulate', {
+    'docs': [{'_source': {'source': {'ip': '8.8.8.8'},
+                          'destination': {'ip': '1.1.1.1'}}}],
+})['docs'][0].get('doc', {}).get('_source'), 'GeoIP pipeline simulation')
+assert simulation.get('source', {}).get('geo', {}).get('country_name'), simulation
+assert simulation.get('source', {}).get('as', {}).get('organization', {}).get('name'), simulation
+assert simulation.get('destination', {}).get('as', {}).get('organization', {}).get('name'), simulation
+print('OK: GeoIP country and source/destination AS organizations (simulation only)')

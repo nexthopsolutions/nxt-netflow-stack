@@ -25,7 +25,8 @@ services:
       xpack.security.transport.ssl.enabled: "false"
       # Senhas/segredos via .env (veja env.example)
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:?Defina ELASTIC_PASSWORD no .env (copie env.example)}
-      ingest.geoip.downloader.enabled: "false"
+      ingest.geoip.downloader.enabled: "true"
+      ingest.geoip.downloader.eager.download: "true"
       TZ: "${TZ:-America/Sao_Paulo}"
     ports:
       - "${HTTP_BIND_ADDRESS:-127.0.0.1}:9200:9200"

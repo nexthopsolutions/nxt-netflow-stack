@@ -39,7 +39,7 @@
             }
           },
           "mappings": [],
-          "unit": "Kbits"
+          "unit": "bytes"
         },
         "overrides": [
           {
@@ -148,9 +148,7 @@
             {
               "field": "network.bytes",
               "id": "1",
-              "settings": {
-                "script": "_value / 10 /2 "
-              },
+              "settings": {},
               "type": "sum"
             }
           ],
@@ -161,7 +159,8 @@
       ],
       "title": "📍 TRÁFEGO POR CIDADE",
       "transparent": true,
-      "type": "piechart"
+      "type": "piechart",
+      "description": "Volume total em bytes no período, agrupado pela localização do IP de origem. Requer GeoIP; IPs privados/reservados podem não ter localização."
     },
     {
       "datasource": {
@@ -181,7 +180,7 @@
             }
           },
           "mappings": [],
-          "unit": "Kbits"
+          "unit": "bytes"
         },
         "overrides": [
           {
@@ -290,9 +289,7 @@
             {
               "field": "network.bytes",
               "id": "1",
-              "settings": {
-                "script": "_value / 10 /2 "
-              },
+              "settings": {},
               "type": "sum"
             }
           ],
@@ -303,7 +300,8 @@
       ],
       "title": "📍 TRÁFEGO POR ESTADO",
       "transparent": true,
-      "type": "piechart"
+      "type": "piechart",
+      "description": "Volume total em bytes no período, agrupado pela localização do IP de origem. Requer GeoIP; IPs privados/reservados podem não ter localização."
     },
     {
       "datasource": {
@@ -323,7 +321,7 @@
             }
           },
           "mappings": [],
-          "unit": "Kbits"
+          "unit": "bytes"
         },
         "overrides": [
           {
@@ -432,9 +430,7 @@
             {
               "field": "network.bytes",
               "id": "1",
-              "settings": {
-                "script": "_value / 10 /2 "
-              },
+              "settings": {},
               "type": "sum"
             }
           ],
@@ -445,7 +441,8 @@
       ],
       "title": "📍 TRÁFEGO POR PAÍS",
       "transparent": true,
-      "type": "piechart"
+      "type": "piechart",
+      "description": "Volume total em bytes no período, agrupado pela localização do IP de origem. Requer GeoIP; IPs privados/reservados podem não ter localização."
     },
     {
       "datasource": {
@@ -474,7 +471,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "smooth",
+            "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -505,7 +502,7 @@
               }
             ]
           },
-          "unit": "Kbits"
+          "unit": "bytes"
         },
         "overrides": []
       },
@@ -523,9 +520,8 @@
             "max"
           ],
           "displayMode": "table",
-          "placement": "right",
-          "showLegend": true,
-          "width": 250
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
           "hideZeros": false,
@@ -539,7 +535,7 @@
           "alias": "",
           "bucketAggs": [
             {
-              "field": "netflow.source_transport_port",
+              "field": "source.port",
               "id": "2",
               "settings": {
                 "min_doc_count": "1",
@@ -553,7 +549,7 @@
               "field": "@timestamp",
               "id": "3",
               "settings": {
-                "interval": "10s",
+                "interval": "auto",
                 "min_doc_count": "1",
                 "timeZone": "utc",
                 "trimEdges": "0"
@@ -571,12 +567,17 @@
           ],
           "query": "",
           "refId": "A",
-          "timeField": "@timestamp"
+          "timeField": "@timestamp",
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "${DS_ELASTICSEARCH}"
+          }
         }
       ],
-      "title": "🚀 TOP 20 - PORTAS ENTRADA",
+      "title": "🚀 TOP 20 - PORTAS ORIGEM",
       "transparent": true,
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Volume em bytes reportado nos fluxos, agregado por intervalo de tempo. Não é taxa em bit/s nem mede velocidade instantânea da interface."
     },
     {
       "datasource": {
@@ -605,7 +606,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "smooth",
+            "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -636,7 +637,7 @@
               }
             ]
           },
-          "unit": "Kbits"
+          "unit": "bytes"
         },
         "overrides": []
       },
@@ -654,11 +655,10 @@
             "max"
           ],
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true,
           "sortBy": "Max",
-          "sortDesc": true,
-          "width": 250
+          "sortDesc": true
         },
         "tooltip": {
           "hideZeros": false,
@@ -686,7 +686,7 @@
               "field": "@timestamp",
               "id": "3",
               "settings": {
-                "interval": "10s",
+                "interval": "auto",
                 "min_doc_count": "1",
                 "timeZone": "utc",
                 "trimEdges": "0"
@@ -704,12 +704,17 @@
           ],
           "query": "",
           "refId": "A",
-          "timeField": "@timestamp"
+          "timeField": "@timestamp",
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "${DS_ELASTICSEARCH}"
+          }
         }
       ],
-      "title": "🚀 TOP 20 - PORTAS SAÍDA",
+      "title": "🚀 TOP 20 - PORTAS DESTINO",
       "transparent": true,
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Volume em bytes reportado nos fluxos, agregado por intervalo de tempo. Não é taxa em bit/s nem mede velocidade instantânea da interface."
     },
     {
       "collapsed": false,
@@ -751,7 +756,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "smooth",
+            "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 3,
             "scaleDistribution": {
@@ -782,7 +787,7 @@
               }
             ]
           },
-          "unit": "KBs"
+          "unit": "bytes"
         },
         "overrides": []
       },
@@ -800,9 +805,8 @@
             "max"
           ],
           "displayMode": "table",
-          "placement": "right",
-          "showLegend": true,
-          "width": 500
+          "placement": "bottom",
+          "showLegend": true
         },
         "timezone": [
           "browser"
@@ -833,7 +837,7 @@
               "field": "@timestamp",
               "id": "3",
               "settings": {
-                "interval": "10s",
+                "interval": "auto",
                 "min_doc_count": "1",
                 "timeZone": "utc",
                 "trimEdges": "0"
@@ -851,12 +855,17 @@
           ],
           "query": "",
           "refId": "A",
-          "timeField": "@timestamp"
+          "timeField": "@timestamp",
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "${DS_ELASTICSEARCH}"
+          }
         }
       ],
       "title": "🚀 TOP 20 - AS ORIGEM",
       "transparent": true,
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Volume em bytes reportado nos fluxos, agregado por intervalo de tempo. Não é taxa em bit/s nem mede velocidade instantânea da interface. Nomes de organizações AS dependem de GeoIP ASN para IPs públicos."
     },
     {
       "collapsed": false,
@@ -898,7 +907,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "smooth",
+            "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 3,
             "scaleDistribution": {
@@ -929,7 +938,7 @@
               }
             ]
           },
-          "unit": "Kbits"
+          "unit": "bytes"
         },
         "overrides": []
       },
@@ -947,9 +956,8 @@
             "max"
           ],
           "displayMode": "table",
-          "placement": "right",
-          "showLegend": true,
-          "width": 500
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
           "hideZeros": false,
@@ -977,7 +985,7 @@
               "field": "@timestamp",
               "id": "3",
               "settings": {
-                "interval": "10s",
+                "interval": "auto",
                 "min_doc_count": "1",
                 "timeZone": "utc",
                 "trimEdges": "0"
@@ -995,12 +1003,17 @@
           ],
           "query": "",
           "refId": "A",
-          "timeField": "@timestamp"
+          "timeField": "@timestamp",
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "${DS_ELASTICSEARCH}"
+          }
         }
       ],
       "title": "🚀 TOP 20 - AS DESTINO",
       "transparent": true,
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Volume em bytes reportado nos fluxos, agregado por intervalo de tempo. Não é taxa em bit/s nem mede velocidade instantânea da interface. Nomes de organizações AS dependem de GeoIP ASN para IPs públicos."
     },
     {
       "datasource": {
@@ -1029,7 +1042,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "smooth",
+            "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 3,
             "scaleDistribution": {
@@ -1060,7 +1073,7 @@
               }
             ]
           },
-          "unit": "Kbits"
+          "unit": "bytes"
         },
         "overrides": []
       },
@@ -1078,11 +1091,10 @@
             "max"
           ],
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true,
           "sortBy": "Last",
-          "sortDesc": true,
-          "width": 500
+          "sortDesc": true
         },
         "tooltip": {
           "hideZeros": false,
@@ -1096,7 +1108,7 @@
           "alias": "",
           "bucketAggs": [
             {
-              "field": "netflow.source_ipv4_address",
+              "field": "source.ip",
               "id": "2",
               "settings": {
                 "min_doc_count": "1",
@@ -1110,7 +1122,7 @@
               "field": "@timestamp",
               "id": "3",
               "settings": {
-                "interval": "10s",
+                "interval": "auto",
                 "min_doc_count": "1",
                 "timeZone": "utc",
                 "trimEdges": "0"
@@ -1128,12 +1140,17 @@
           ],
           "query": "",
           "refId": "A",
-          "timeField": "@timestamp"
+          "timeField": "@timestamp",
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "${DS_ELASTICSEARCH}"
+          }
         }
       ],
       "title": "🚀 TOP 20 - IPS ORIGEM",
       "transparent": true,
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Volume em bytes reportado nos fluxos, agregado por intervalo de tempo. Não é taxa em bit/s nem mede velocidade instantânea da interface."
     },
     {
       "datasource": {
@@ -1162,7 +1179,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "smooth",
+            "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 3,
             "scaleDistribution": {
@@ -1193,7 +1210,7 @@
               }
             ]
           },
-          "unit": "Kbits"
+          "unit": "bytes"
         },
         "overrides": []
       },
@@ -1211,11 +1228,10 @@
             "max"
           ],
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true,
           "sortBy": "Max",
-          "sortDesc": true,
-          "width": 500
+          "sortDesc": true
         },
         "tooltip": {
           "hideZeros": false,
@@ -1243,7 +1259,7 @@
               "field": "@timestamp",
               "id": "3",
               "settings": {
-                "interval": "10s",
+                "interval": "auto",
                 "min_doc_count": "1",
                 "timeZone": "utc",
                 "trimEdges": "0"
@@ -1261,12 +1277,17 @@
           ],
           "query": "",
           "refId": "A",
-          "timeField": "@timestamp"
+          "timeField": "@timestamp",
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "${DS_ELASTICSEARCH}"
+          }
         }
       ],
       "title": "🚀 TOP 20 - IPS DESTINO",
       "transparent": true,
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Volume em bytes reportado nos fluxos, agregado por intervalo de tempo. Não é taxa em bit/s nem mede velocidade instantânea da interface."
     }
   ],
   "preload": false,
@@ -1297,5 +1318,7 @@
   "timezone": "browser",
   "title": "[NEXTHOP - ANALISE POR GLOBAL NETFLOW]",
   "uid": "fff4a0e1-5179-4224-b3bc-8377fc6fcdb3",
-  "version": 3
+  "version": 4,
+  "refresh": "30s",
+  "description": "Volumes de bytes reportados pelos exportadores NetFlow/IPFIX. As séries agregam bytes por intervalo de tempo; não representam velocidade instantânea. Localização e organização AS dependem do enriquecimento GeoIP de IPs públicos."
 }
