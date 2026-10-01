@@ -1,10 +1,32 @@
-# nxt-netflow-stack (NextHop Flow Stack)
+<div align="center">
+
+# NextHop Flow Stack
+
+**Visibilidade de tráfego NetFlow para provedores de Internet.**
+
+Elasticsearch · Kibana · Filebeat · Grafana
+
+[![Licença Apache 2.0](https://img.shields.io/github/license/nexthopsolutions/nxt-netflow-stack?style=flat-square&color=2563eb)](./LICENSE)
+[![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white)](./docker-compose.yaml)
+[![GitHub Stars](https://img.shields.io/github/stars/nexthopsolutions/nxt-netflow-stack?style=flat-square&color=eab308)](https://github.com/nexthopsolutions/nxt-netflow-stack/stargazers)
+
+[**Começar agora**](#quick-start) · [Dashboard](./template-grafana.json) · [Configuração](#configuracao-env) · [Solução de problemas](#troubleshooting)
+
+</div>
+
+---
 
 Stack de **NetFlow para ISPs**, com **Elasticsearch, Kibana, Filebeat e Grafana**, desenvolvida pela **NextHop Solutions®**, através de seu CEO **Elizandro Pacheco**, como contribuição para a comunidade.
 
-Preparada para apresentação na [15ª Semana de Infraestrutura da Internet no Brasil](https://semanainfra.nic.br/) e no [GTER/GTS](https://gtergts.nic.br/). Se o projeto lhe for útil, deixe uma estrela no GitHub.
+Preparada para apresentação na [15ª Semana de Infraestrutura da Internet no Brasil](https://semanainfra.nic.br/) e no [GTER/GTS](https://gtergts.nic.br/).
 
-A configuração incluída é uma base **single-node para laboratório e testes locais**. Recebe fluxos, armazena os eventos e provisiona um dashboard no Grafana. Para produção, dimensione recursos, retenção, autenticação, TLS e backups conforme seu ambiente.
+Receba fluxos dos seus equipamentos, explore eventos no Kibana e visualize o tráfego em um dashboard Grafana provisionado automaticamente.
+
+> [!TIP]
+> **O projeto ajudou você? Dê uma estrela ⭐** no [repositório](https://github.com/nexthopsolutions/nxt-netflow-stack), pelo botão **Star** no topo da página. Isso ajuda outros profissionais a encontrar a solução e apoia sua divulgação na comunidade.
+
+> [!IMPORTANT]
+> Esta configuração é uma base **single-node para laboratório e testes locais**. Para produção, dimensione recursos, retenção, autenticação, TLS e backups conforme seu ambiente.
 
 ## 📌 Sumário
 
@@ -342,7 +364,8 @@ docker compose down
 
 ### Apagar os dados desta configuração
 
-**Destrutivo:** o comando abaixo remove os volumes atuais, incluindo eventos e estado do Grafana. Use somente para reinicialização intencional ou após backup.
+> [!WARNING]
+> **Este comando apaga os dados.** Ele remove os volumes atuais, incluindo eventos e estado do Grafana. Use somente para reinicialização intencional ou após backup.
 
 ```bash
 docker compose down -v
