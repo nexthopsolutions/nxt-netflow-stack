@@ -1371,5 +1371,5 @@
   "uid": "fff4a0e1-5179-4224-b3bc-8377fc6fcdb3",
   "version": 5,
   "refresh": "30s",
-  "description": "Taxas em bps (escala automática Kbps/Mbps/Gbps), calculadas como bytes reportados × 8 / 10 segundos. Eventos são agrupados pelo timestamp de exportação; não é medição instantânea da interface nem redistribuição pela duração original dos fluxos."
+  "description": "Taxas em bps (escala automática Kbps/Mbps/Gbps), calculadas como bytes reportados × 8 / 10 segundos. Eventos são agrupados pelo timestamp de exportação; não é medição instantânea da interface nem redistribuição pela duração original dos fluxos. Desenvolvido por Elizandro Pacheco — NextHop Solutions®. SPDX-License-Identifier: Apache-2.0. Licença: https://github.com/nexthopsolutions/nxt-netflow-stack/blob/main/LICENSE; atribuições: https://github.com/nexthopsolutions/nxt-netflow-stack/blob/main/NOTICE. Modificado em 2026-10-01: correção de consultas, unidades e créditos."
 }

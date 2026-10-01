@@ -1,10 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+# Autor/desenvolvedor: Elizandro Pacheco — NextHop Solutions® (https://nexthop.solutions/).
+# Licença e atribuições: consulte LICENSE e NOTICE na raiz do repositório.
+# Modificado em 2026-10-01: atualização da stack, testes, documentação e avisos.
+
 name: nexthop_flow_stack
 
-# Desenvolvido pela NextHop Solutions (https://nexthop.solutions)
+# Desenvolvido pela NextHop Solutions® (https://nexthop.solutions)
 x-nexthop:
-  description: "Elastic Stack (Elasticsearch + Kibana) + Grafana + Filebeat (NetFlow). Desenvolvido pela NextHop Solutions (https://nexthop.solutions)"
+  description: "Elastic Stack (Elasticsearch + Kibana) + Grafana + Filebeat (NetFlow). Desenvolvido pela NextHop Solutions® (https://nexthop.solutions)"
   notes: |
-    - Desenvolvido pela NextHop Solutions (https://nexthop.solutions)
+    - Desenvolvido pela NextHop Solutions® (https://nexthop.solutions)
     - Elasticsearch: porta 9200
     - Kibana: porta 5601
     - Grafana: porta 3000
@@ -12,7 +17,7 @@ x-nexthop:
 
 services:
   elasticsearch:
-    x-description: "Elasticsearch (single-node). Desenvolvido pela NextHop Solutions (https://nexthop.solutions)"
+    x-description: "Elasticsearch (single-node). Desenvolvido pela NextHop Solutions® (https://nexthop.solutions)"
     image: docker.elastic.co/elasticsearch/elasticsearch:9.5.4
     container_name: nexthop_flow_stack-elasticsearch
     restart: unless-stopped
@@ -51,7 +56,7 @@ services:
       - nexthop_flow_stack_net
 
   setup_kibana_system_password:
-    x-description: "Inicialização: configura a senha do usuário kibana_system no Elasticsearch. Desenvolvido pela NextHop Solutions (https://nexthop.solutions)"
+    x-description: "Inicialização: configura a senha do usuário kibana_system no Elasticsearch. Desenvolvido pela NextHop Solutions® (https://nexthop.solutions)"
     image: curlimages/curl:8.22.0
     container_name: nexthop_flow_stack-setup_kibana_system_password
     restart: "no"
@@ -83,7 +88,7 @@ services:
       - nexthop_flow_stack_net
 
   kibana:
-    x-description: "Kibana UI. Desenvolvido pela NextHop Solutions (https://nexthop.solutions)"
+    x-description: "Kibana UI. Desenvolvido pela NextHop Solutions® (https://nexthop.solutions)"
     image: docker.elastic.co/kibana/kibana:9.5.4
     container_name: nexthop_flow_stack-kibana
     restart: unless-stopped
@@ -105,7 +110,7 @@ services:
       - nexthop_flow_stack_net
 
   filebeat:
-    x-description: "Filebeat (NetFlow). Desenvolvido pela NextHop Solutions (https://nexthop.solutions)"
+    x-description: "Filebeat (NetFlow). Desenvolvido pela NextHop Solutions® (https://nexthop.solutions)"
     image: docker.elastic.co/beats/filebeat:9.5.4
     container_name: nexthop_flow_stack-filebeat
     restart: unless-stopped
@@ -128,7 +133,7 @@ services:
       - nexthop_flow_stack_net
 
   grafana:
-    x-description: "Grafana. Desenvolvido pela NextHop Solutions (https://nexthop.solutions)"
+    x-description: "Grafana. Desenvolvido pela NextHop Solutions® (https://nexthop.solutions)"
     image: grafana/grafana:13.2.3
     container_name: nexthop_flow_stack-grafana
     restart: unless-stopped

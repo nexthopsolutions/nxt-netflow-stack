@@ -1,0 +1,24 @@
+nxt-netflow-stack (NextHop Flow Stack)
+
+Autor e desenvolvedor: Elizandro Pacheco
+Desenvolvido pela NextHop Solutions® — https://nexthop.solutions/
+Repositório: https://github.com/nexthopsolutions/nxt-netflow-stack
+
+Projeto disponibilizado sob Apache License, Version 2.0 (Apache-2.0).
+O texto integral está em LICENSE. Estes avisos são informativos e não
+modificam a licença nem criam condições adicionais.
+
+Atribuição aplicável ao código, às configurações, à documentação e ao
+arquivo template-grafana.json de autoria do projeto. A apresentação
+"[GTER 54] Elizandro Pacheco.pdf" é creditada a Elizandro Pacheco; consulte
+também o arquivo de avisos que a acompanha e os créditos do próprio material.
+
+NextHop Solutions®, EvoCODE IA® e Network Education® são marcas registradas.
+A Apache 2.0 não concede autorização geral para uso de marcas. A seção 6
+preserva o uso razoável e costumeiro necessário para descrever a origem
+da obra e reproduzir este NOTICE; isso não implica endosso ou afiliação.
+
+Logos, imagens e materiais de terceiros conservam seus respectivos direitos
+e avisos. Elasticsearch, Kibana, Filebeat, Grafana, curl e bases GeoIP são
+componentes externos sujeitos às próprias licenças e atribuições; a licença
+deste repositório não os relicencia.

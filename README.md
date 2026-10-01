@@ -1,6 +1,13 @@
+<!--
+SPDX-License-Identifier: Apache-2.0
+Autor/desenvolvedor: Elizandro Pacheco — NextHop Solutions® (https://nexthop.solutions/).
+Licença e atribuições: consulte LICENSE e NOTICE na raiz do repositório.
+Modificado em 2026-10-01: atualização da stack, testes, documentação e avisos.
+-->
+
 <div align="center">
 
-# NextHop Flow Stack
+# nxt-netflow-stack (NextHop Flow Stack)
 
 **Visibilidade de tráfego NetFlow para provedores de Internet.**
 
@@ -471,9 +478,9 @@ Obrigado aos apoiadores que fortalecem a iniciativa e a comunidade:
 <a id="licenca"></a>
 ## 📄 Licença
 
-Este projeto é distribuído sob a licença **Apache 2.0**. Veja o arquivo `LICENSE`.
+Este projeto é distribuído sob a licença **Apache 2.0**. Consulte [LICENSE](./LICENSE) e os créditos de [NOTICE](./NOTICE). Autor/desenvolvedor: **Elizandro Pacheco — NextHop Solutions®**.
 
-NextHop Solutions®, EvoCODE IA® e Network Education® são marcas registradas. A licença do código não concede direitos sobre essas marcas.
+NextHop Solutions®, EvoCODE IA® e Network Education® são marcas registradas. A licença não concede autorização geral de uso dessas marcas; preserva o uso razoável necessário para identificar a origem da obra e reproduzir os avisos, conforme a seção 6.
 
 As imagens e dependências utilizadas possuem suas próprias licenças; a licença do repositório não substitui as condições de cada componente.
 
@@ -494,12 +501,12 @@ A tradução de referência está em [LICENSE.pt-BR.md](./LICENSE.pt-BR.md). O t
 - **Incluir uma cópia da licença Apache 2.0** quando redistribuir.
 - **Manter avisos de copyright/atribuição** e notices existentes.
 - **Indicar mudanças**: arquivos modificados devem conter aviso claro de que foram alterados.
-- Se houver arquivo `NOTICE` no futuro, **reproduzir o conteúdo aplicável** ao redistribuir.
+- **Preservar os avisos de atribuição aplicáveis de [NOTICE](./NOTICE)** nas redistribuições, conforme a seção 4(d) da licença.
 
 #### Você NÃO PODE 🚫
 
 - **Usar marcas/nome/logotipos** da NextHop Solutions® (ou de terceiros) como se houvesse endosso/afiliações: a Apache 2.0 **não concede licença de marca** (ver “Trademarks” no `LICENSE`).
-- **Remover atribuições/avisos legais** existentes do projeto original ao redistribuir.
+- **Remover avisos legais e de atribuição aplicáveis** às partes redistribuídas, em desacordo com a seção 4 da licença.
 
 Em outras palavras: **sim**, a Apache 2.0 permite você usar/alterar/redistribuir e até trocar o mantenedor do *seu fork*, **desde que** você cumpra as obrigações de atribuição/licença e não use marcas como se fossem permissão/endorso.
 

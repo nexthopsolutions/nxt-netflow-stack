@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
+# Autor/desenvolvedor: Elizandro Pacheco — NextHop Solutions® (https://nexthop.solutions/).
+# Licença e atribuições: consulte LICENSE e NOTICE na raiz do repositório.
+# Modificado em 2026-10-01: atualização da stack, testes, documentação e avisos.
+
 """Local smoke test: services -> UDP NetFlow v5 -> Elasticsearch -> Grafana."""
 import base64
 import json
