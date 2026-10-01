@@ -233,7 +233,29 @@ Referência: [MikroTik — Traffic Flow](https://help.mikrotik.com/docs/spaces/R
 
 ### Huawei VRP / NetStream
 
-A sintaxe depende do modelo e da versão de VRP. Configure exportação v9, destino UDP/2055, IP de origem alcançável e coleta nas interfaces desejadas conforme o manual do equipamento. Não trate uma sequência genérica como configuração universal.
+Exemplo de configuração NetStream para exportar **NetFlow v9** ao Filebeat em **UDP/2055**. Substitua os valores entre `<...>` antes de aplicar:
+
+```text
+system-view
+ip netstream export version 9
+ip netstream export host <IP_DO_SERVIDOR_FILEBEAT> 2055
+ip netstream export source <IP_DE_ORIGEM_DO_EXPORTADOR>
+ip netstream timeout active 1
+ip netstream timeout inactive 15
+
+interface <INTERFACE_MONITORADA>
+ ip netstream inbound
+ ip netstream outbound
+quit
+return
+save
+```
+
+- `<IP_DO_SERVIDOR_FILEBEAT>`: endereço do host que executa esta stack, alcançável pelo equipamento.
+- `<IP_DE_ORIGEM_DO_EXPORTADOR>`: IP local do equipamento usado como origem dos pacotes de exportação, por exemplo o endereço de uma loopback com rota até o coletor.
+- `<INTERFACE_MONITORADA>`: interface cujo tráfego será coletado; repita o bloco para outras interfaces, conforme necessário.
+
+A sintaxe, as unidades dos timeouts e a necessidade de `commit` variam conforme o modelo e a versão do VRP. Algumas plataformas usam a família de comandos `netstream export ip` em vez de `ip netstream export`. Confirme no manual do equipamento; ajuste interfaces, direção e timeouts ao seu ambiente. O comando `save` persiste a configuração após a validação.
 
 Referência: [Huawei — exemplo de exportação de estatísticas de fluxo](https://support.huawei.cn/enterprise/en/doc/EDOC1100468733/85a6c438/example-for-configuring-flexible-flow-statistics-export).
 
