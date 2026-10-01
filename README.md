@@ -132,12 +132,14 @@ As tags são explícitas: `docker compose pull` baixa as versões declaradas, se
 <a id="portas-e-endpoints"></a>
 ## 🧭 Portas e endpoints
 
-| Serviço | Porta no host | Publicação padrão |
-|---|---|---|
-| Elasticsearch | TCP/9200 | `127.0.0.1` |
-| Kibana | TCP/5601 | `127.0.0.1` |
-| Grafana | TCP/3000 | `127.0.0.1` |
-| Filebeat NetFlow | UDP/2055 | Todas as interfaces disponíveis |
+| Serviço | Porta no host | Publicação padrão | Endereço de acesso / destino |
+|---|---|---|---|
+| Elasticsearch | TCP/9200 | `127.0.0.1` | [http://127.0.0.1:9200](http://127.0.0.1:9200) |
+| Kibana | TCP/5601 | `127.0.0.1` | [http://127.0.0.1:5601](http://127.0.0.1:5601) |
+| Grafana | TCP/3000 | `127.0.0.1` | [http://127.0.0.1:3000](http://127.0.0.1:3000) |
+| Filebeat NetFlow | UDP/2055 | Todas as interfaces disponíveis | `<IP_DO_HOST_DOCKER>:2055` via UDP; sem interface HTTP |
+
+Os links `127.0.0.1` devem ser abertos na própria máquina que executa o Docker. Para exportar flows de um equipamento de rede, use o IP alcançável do host Docker, não `127.0.0.1`.
 
 Para acessar as interfaces HTTP a partir de outra máquina, configure `HTTP_BIND_ADDRESS` com o IP da interface do host desejada e execute `docker compose up -d`. `0.0.0.0` publica em todas as interfaces IPv4; restrinja o acesso por firewall/VPN. Esse ajuste **não altera** a publicação UDP.
 
