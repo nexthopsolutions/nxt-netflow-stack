@@ -14,3 +14,11 @@ output.elasticsearch:
   username: elastic
   password: "${ELASTIC_PASSWORD}"
 setup.kibana.host: "http://kibana:5601"
+
+# Fonte de verdade da retenção: alterações pela UI serão sobrescritas no início.
+# Exclusão automática de índices 7 dias após rollover (veja README).
+setup.ilm.enabled: true
+setup.ilm.policy_name: filebeat
+setup.ilm.policy_file: /usr/share/filebeat/ilm-policy.json
+setup.ilm.check_exists: true
+setup.ilm.overwrite: true

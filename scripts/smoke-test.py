@@ -68,6 +68,18 @@ uid = 'aeznn8invxnggb'
 wait_for(lambda: grafana('/api/dashboards/uid/fff4a0e1-5179-4224-b3bc-8377fc6fcdb3'),
          'Dashboard provisioned')
 
+def collector_ready():
+    result = subprocess.run(
+        ['docker', 'compose', 'exec', '-T', 'filebeat', 'cat',
+         '/proc/net/udp', '/proc/net/udp6'], cwd=ROOT,
+        capture_output=True, text=True, timeout=10)
+    return result.returncode == 0 and any(
+        len(parts) > 1 and parts[1].endswith(':0807')
+        for parts in (line.split() for line in result.stdout.splitlines()))
+
+
+wait_for(collector_ready, 'Filebeat listening on UDP/2055 after index setup')
+
 # One v5 flow: documentation-only IPs, 10 packets, 1200 bytes, UDP/443.
 source_port = secrets.randbelow(20000) + 40000
 now = int(time.time())
@@ -147,3 +159,18 @@ assert simulation.get('source', {}).get('geo', {}).get('country_name'), simulati
 assert simulation.get('source', {}).get('as', {}).get('organization', {}).get('name'), simulation
 assert simulation.get('destination', {}).get('as', {}).get('organization', {}).get('name'), simulation
 print('OK: GeoIP country and source/destination AS organizations (simulation only)')
+
+expected_policy = json.loads((ROOT / 'elasticsearch/ilm-policy.json').read_text())['policy']
+actual_policy = es('/_ilm/policy/filebeat')['filebeat']['policy']
+# Elasticsearch materializes defaults (min_age=0ms, delete_searchable_snapshot).
+assert set(actual_policy['phases']) == set(expected_policy['phases']), actual_policy
+assert actual_policy['phases']['hot']['actions']['rollover'] == expected_policy['phases']['hot']['actions']['rollover'], actual_policy
+assert actual_policy['phases']['delete']['min_age'] == expected_policy['phases']['delete']['min_age'], actual_policy
+assert 'delete' in actual_policy['phases']['delete']['actions'], actual_policy
+assert es('/_ilm/status')['operation_mode'] == 'RUNNING', 'ILM is not running'
+managed = es('/filebeat-*/_ilm/explain')['indices']
+assert managed, 'No Filebeat backing indices to verify'
+for name, state in managed.items():
+    assert state.get('managed') and state.get('policy') == 'filebeat', (name, state)
+    assert state.get('step') != 'ERROR', (name, state)
+print('OK: retention policy installed, ILM running, backing indices managed without errors')

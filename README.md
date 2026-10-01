@@ -163,7 +163,8 @@ O módulo NetFlow do Filebeat decodifica os fluxos e envia os eventos ao Elastic
 | `docker-compose.yaml` | Serviços, versões, portas, rede e volumes |
 | `env.example` | Modelo de configuração sem senhas preenchidas |
 | `.env` | Credenciais locais; ignorado pelo Git |
-| `filebeat.yml` | Módulo NetFlow e saída para Elasticsearch |
+| `filebeat.yml` | Módulo NetFlow, saída e instalação da política ILM |
+| `elasticsearch/ilm-policy.json` | Rollover e exclusão automática dos índices NetFlow |
 | `grafana/provisioning/datasources/elasticsearch.yaml` | Datasource Elasticsearch |
 | `grafana/provisioning/dashboards/netflow.yaml` | Provisionamento do dashboard |
 | `template-grafana.json` | Dashboard carregado na pasta NetFlow |
@@ -176,7 +177,7 @@ O módulo NetFlow do Filebeat decodifica os fluxos e envia os eventos ao Elastic
 - Python 3 para gerar o `.env` pelo exemplo e executar o teste, sem bibliotecas adicionais.
 - Portas indicadas acima disponíveis e acesso aos registries para baixar as imagens.
 - Como ponto de partida para laboratório: 2 vCPU e pelo menos 4 GB de RAM disponíveis para a stack. Considere 8 GB ou mais para o Docker Desktop quando houver outros projetos rodando. Isso não é um dimensionamento de produção.
-- Disco conforme o volume de fluxos e a retenção. O projeto não define um prazo próprio de exclusão dos eventos.
+- Disco conforme o volume de fluxos e a retenção. O projeto aplica exclusão automática por ILM; dimensione o disco para a retenção descrita abaixo.
 
 A execução local desta atualização foi validada em Docker Desktop **ARM64**. Valide desempenho e capacidade no hardware de destino.
 
@@ -306,9 +307,43 @@ O Filebeat não possui volume persistente nesta configuração; seu estado local
 
 ### Retenção e backup
 
-Não há política de retenção personalizada nesta stack. Verifique a política ILM efetiva no Elasticsearch e defina rollover/exclusão conforme a capacidade do disco. Monitore espaço livre e taxa de ingestão.
+A stack instala automaticamente a política ILM `filebeat`, definida em [`elasticsearch/ilm-policy.json`](./elasticsearch/ilm-policy.json):
 
-Para dados importantes, configure snapshots do Elasticsearch e backup consistente do Grafana, além de guardar as configurações e os segredos com acesso restrito. Volumes Docker não substituem backups.
+| Parâmetro | Padrão | Efeito |
+|---|---|---|
+| `hot.actions.rollover.max_age` | `1d` | Rollover por idade do índice |
+| `hot.actions.rollover.max_primary_shard_size` | `5gb` | Rollover quando o maior shard primário atingir esse tamanho |
+| `delete.min_age` | `7d` | Exclusão do índice 7 dias após o rollover |
+
+O rollover ocorre quando qualquer limite máximo é atingido, normalmente para índices não vazios. O índice de escrita permanece ativo até o rollover. A idade da fase de exclusão é contada **a partir do rollover**, não do timestamp de cada evento: com rollover diário, dados ingeridos podem permanecer aproximadamente **7 a 8 dias**, além do tempo de execução do ILM. Eventos antigos recebidos com atraso não são eliminados pelo seu timestamp original. Consulte a [documentação de rollover e idade das fases](https://www.elastic.co/docs/manage-data/lifecycle/index-lifecycle-management/rollover).
+
+> [!WARNING]
+> **A retenção exclui dados automaticamente e de forma definitiva.** Este padrão é destinado à stack dedicada. Ao atualizar uma instalação existente, a política `filebeat` será substituída e índices já vinculados a ela poderão tornar-se elegíveis para exclusão. Confira o histórico necessário e faça backup antes de aplicar. Não use essa política compartilhada com outros produtores sem revisar o impacto.
+
+Para ajustar, edite os três valores no JSON e recrie o Filebeat:
+
+```bash
+docker compose up -d --force-recreate filebeat
+```
+
+O arquivo versionado é a fonte de verdade: `setup.ilm.overwrite: true` reaplica a política na inicialização do Filebeat. Alterações feitas apenas pelo Kibana serão sobrescritas. Índices com outra política ou sem ILM precisam de avaliação/migração específica; esta configuração não os adota automaticamente. Mudanças em políticas de índices existentes podem aguardar a transição de fase, por causa do cache de execução do ILM.
+
+**Retenção por tempo não é limite de disco.** O rollover de 5 GB limita o tamanho-alvo de cada shard, não a soma dos índices. Como estimativa inicial, use `GB indexados por dia × 8 dias × (1 + número de réplicas)`, acrescente margem para translogs, merges, logs e outros serviços e mantenha espaço livre. Meça os bytes armazenados no Elasticsearch: tráfego em Gbps não se converte diretamente em GB de documentos NetFlow. Os watermarks do Elasticsearch protegem a alocação/escrita, mas não substituem exclusão nem alertas de disco.
+
+Os logs Docker usam rotação de **10 MB × 3 arquivos por container** (`json-file`). Isso limita os logs dos containers desta stack, não os índices, imagens, cache de build ou volumes de outros projetos.
+
+Verifique pelo **Kibana → Dev Tools** (usuário com permissões apropriadas):
+
+```http
+GET _ilm/policy/filebeat
+GET filebeat-*/_ilm/explain
+GET _cat/indices/filebeat-*?v&bytes=gb&expand_wildcards=all
+GET _cat/allocation?v&bytes=gb
+```
+
+Confirme `managed: true`, política `filebeat` e ausência de erros no `_ilm/explain`. Uma política criada, mas não vinculada aos índices, não garante retenção. O smoke test verifica o conteúdo da política e o vínculo dos índices existentes, sem esperar sete dias nem apagar dados para testar.
+
+Para dados importantes, configure snapshots do Elasticsearch e backup consistente do Grafana, além de guardar configurações e segredos com acesso restrito. Volumes Docker não substituem backups. Defina também retenção dos próprios snapshots.
 
 ### Atualização da stack antiga
 

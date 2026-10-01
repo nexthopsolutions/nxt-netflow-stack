@@ -1,0 +1,27 @@
+{
+  "policy": {
+    "_meta": {
+      "description": "Retenção NetFlow: exclusão 7 dias após rollover; ajuste conforme ingestão e capacidade.",
+      "author": "Elizandro Pacheco — NextHop Solutions®",
+      "license": "Apache-2.0",
+      "notice": "Consulte LICENSE e NOTICE na raiz do repositório.",
+      "modified": "2026-10-01"
+    },
+    "phases": {
+      "hot": {
+        "actions": {
+          "rollover": {
+            "max_age": "1d",
+            "max_primary_shard_size": "5gb"
+          }
+        }
+      },
+      "delete": {
+        "min_age": "7d",
+        "actions": {
+          "delete": {}
+        }
+      }
+    }
+  }
+}
