@@ -13,7 +13,7 @@ x-nexthop:
 services:
   elasticsearch:
     x-description: "Elasticsearch (single-node). Desenvolvido pela NextHop Solutions (https://nexthop.solutions)"
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.5.4
     container_name: nexthop_flow_stack-elasticsearch
     restart: unless-stopped
     environment:
@@ -24,13 +24,13 @@ services:
       xpack.security.http.ssl.enabled: "false"
       xpack.security.transport.ssl.enabled: "false"
       # Senhas/segredos via .env (veja env.example)
-      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD?Defina ELASTIC_PASSWORD no .env (copie env.example)}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:?Defina ELASTIC_PASSWORD no .env (copie env.example)}
       ingest.geoip.downloader.enabled: "false"
       TZ: "${TZ:-America/Sao_Paulo}"
     ports:
-      - "9200:9200"
+      - "${HTTP_BIND_ADDRESS:-127.0.0.1}:9200:9200"
     volumes:
-      - nexthop_flow_stack_elasticsearch_data:/usr/share/elasticsearch/data
+      - elasticsearch_v9_data:/usr/share/elasticsearch/data
     ulimits:
       memlock:
         soft: -1
@@ -51,7 +51,7 @@ services:
 
   setup_kibana_system_password:
     x-description: "Inicialização: configura a senha do usuário kibana_system no Elasticsearch. Desenvolvido pela NextHop Solutions (https://nexthop.solutions)"
-    image: curlimages/curl:8.10.1
+    image: curlimages/curl:8.22.0
     container_name: nexthop_flow_stack-setup_kibana_system_password
     restart: "no"
     depends_on:
@@ -61,39 +61,40 @@ services:
       - sh
       - -c
       - |
-        set -e
-        echo "Aguardando Elasticsearch responder..."
-        until curl -s -u "elastic:${ELASTIC_PASSWORD}" http://elasticsearch:9200 >/dev/null; do
-          sleep 2
-        done
+        set -eu
+        # Senhas para este bootstrap devem ser tokens URL-safe (veja env.example).
+        case "$$KIBANA_SYSTEM_PASSWORD" in
+          *[!a-zA-Z0-9_-]*|'') echo "Use KIBANA_SYSTEM_PASSWORD URL-safe (A-Z, a-z, 0-9, _ e -)" >&2; exit 1 ;;
+        esac
         echo "Configurando senha do kibana_system..."
-        curl -sS -u "elastic:${ELASTIC_PASSWORD}" \
+        curl --fail --silent --show-error --connect-timeout 5 --max-time 30 \
+          --retry 5 --retry-delay 2 --retry-connrefused \
+          -u "elastic:$$ELASTIC_PASSWORD" \
           -H 'Content-Type: application/json' \
-          -X POST \
-          http://elasticsearch:9200/_security/user/kibana_system/_password \
-          -d "{\"password\":\"${KIBANA_SYSTEM_PASSWORD}\"}" >/dev/null
+          -X POST http://elasticsearch:9200/_security/user/kibana_system/_password \
+          -d "{\"password\":\"$$KIBANA_SYSTEM_PASSWORD\"}" >/dev/null
         echo "OK"
     environment:
-      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD?Defina ELASTIC_PASSWORD no .env (copie env.example)}
-      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD?Defina KIBANA_SYSTEM_PASSWORD no .env (copie env.example)}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:?Defina ELASTIC_PASSWORD no .env (copie env.example)}
+      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:?Defina KIBANA_SYSTEM_PASSWORD no .env (copie env.example)}
       TZ: "${TZ:-America/Sao_Paulo}"
     networks:
       - nexthop_flow_stack_net
 
   kibana:
     x-description: "Kibana UI. Desenvolvido pela NextHop Solutions (https://nexthop.solutions)"
-    image: docker.elastic.co/kibana/kibana:8.12.2
+    image: docker.elastic.co/kibana/kibana:9.5.4
     container_name: nexthop_flow_stack-kibana
     restart: unless-stopped
     environment:
       ELASTICSEARCH_HOSTS: "http://elasticsearch:9200"
       ELASTICSEARCH_USERNAME: "kibana_system"
-      ELASTICSEARCH_PASSWORD: ${KIBANA_SYSTEM_PASSWORD?Defina KIBANA_SYSTEM_PASSWORD no .env (copie env.example)}
+      ELASTICSEARCH_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:?Defina KIBANA_SYSTEM_PASSWORD no .env (copie env.example)}
       SERVER_NAME: "kibana"
       SERVER_HOST: "0.0.0.0"
       TZ: "${TZ:-America/Sao_Paulo}"
     ports:
-      - "5601:5601"
+      - "${HTTP_BIND_ADDRESS:-127.0.0.1}:5601:5601"
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -104,23 +105,17 @@ services:
 
   filebeat:
     x-description: "Filebeat (NetFlow). Desenvolvido pela NextHop Solutions (https://nexthop.solutions)"
-    image: docker.elastic.co/beats/filebeat:8.12.2
+    image: docker.elastic.co/beats/filebeat:9.5.4
     container_name: nexthop_flow_stack-filebeat
     restart: unless-stopped
     environment:
       TZ: "${TZ:-America/Sao_Paulo}"
-    # Filebeat 8.x usa data streams por padrão. Evite sobrescrever template/ILM com settings legados,
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:?Defina ELASTIC_PASSWORD no .env}
+    # Filebeat 9.x usa data streams por padrão. Evite sobrescrever template/ILM com settings legados,
     # pois isso pode impedir a criação do data stream e a indexação.
-    command: >
-      filebeat -e -strict.perms=false
-      -E output.elasticsearch.hosts=["http://elasticsearch:9200"]
-      -E output.elasticsearch.username=elastic
-      -E output.elasticsearch.password="${ELASTIC_PASSWORD?Defina ELASTIC_PASSWORD no .env (copie env.example)}"
-      -E setup.kibana.host=kibana:5601
-      -E filebeat.modules.0.module=netflow
-      -E filebeat.modules.0.log.enabled=true
-      -E filebeat.modules.0.log.var.netflow_host=0.0.0.0
-      -E filebeat.modules.0.log.var.netflow_port=2055
+    command: ["filebeat", "-e", "--strict.perms=false"]
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
     ports:
       - "2055:2055/udp"
     depends_on:
@@ -133,28 +128,28 @@ services:
 
   grafana:
     x-description: "Grafana. Desenvolvido pela NextHop Solutions (https://nexthop.solutions)"
-    image: grafana/grafana:11.2.0
+    image: grafana/grafana:13.2.3
     container_name: nexthop_flow_stack-grafana
     restart: unless-stopped
     environment:
       TZ: "${TZ:-America/Sao_Paulo}"
       GF_SECURITY_ADMIN_USER: "${GRAFANA_ADMIN_USER:-admin}"
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD?Defina GRAFANA_ADMIN_PASSWORD no .env (copie env.example)}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?Defina GRAFANA_ADMIN_PASSWORD no .env (copie env.example)}
       GF_USERS_ALLOW_SIGN_UP: "false"
       # Para provisionar o datasource Elasticsearch automaticamente
-      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD?Defina ELASTIC_PASSWORD no .env (copie env.example)}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:?Defina ELASTIC_PASSWORD no .env (copie env.example)}
     ports:
-      - "3000:3000"
+      - "${HTTP_BIND_ADDRESS:-127.0.0.1}:3000:3000"
     volumes:
-      - nexthop_flow_stack_grafana_data:/var/lib/grafana
+      - grafana_v13_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
-      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - ./template-grafana.json:/var/lib/grafana/dashboards/netflow.json:ro
     networks:
       - nexthop_flow_stack_net
 
 volumes:
-  nexthop_flow_stack_elasticsearch_data: {}
-  nexthop_flow_stack_grafana_data: {}
+  elasticsearch_v9_data: {}
+  grafana_v13_data: {}
 
 networks:
   # Sim — o Docker Compose cria essa rede automaticamente (a menos que você use `external: true`).
